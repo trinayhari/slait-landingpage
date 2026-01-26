@@ -219,6 +219,190 @@ body {
   border-color: rgba(34, 211, 238, 0.5);
 }
 
+/* Chaos floating animations for pain points */
+@keyframes chaos-float-1 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-2deg);
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(10px, -15px) rotate(1deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-5px, -8px) rotate(-1deg);
+    opacity: 0.85;
+  }
+  75% {
+    transform: translate(15px, -20px) rotate(2deg);
+    opacity: 0.95;
+  }
+}
+
+@keyframes chaos-float-2 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(1deg);
+    opacity: 0.85;
+  }
+  25% {
+    transform: translate(-15px, 10px) rotate(-2deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(8px, -12px) rotate(1deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(-10px, 5px) rotate(-1deg);
+    opacity: 0.88;
+  }
+}
+
+@keyframes chaos-float-3 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(2deg);
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(12px, 8px) rotate(-1deg);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(-8px, 15px) rotate(2deg);
+    opacity: 0.95;
+  }
+  75% {
+    transform: translate(5px, -10px) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes chaos-float-4 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-1deg);
+    opacity: 0.88;
+  }
+  25% {
+    transform: translate(-12px, -8px) rotate(2deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(10px, 12px) rotate(-2deg);
+    opacity: 0.9;
+  }
+  75% {
+    transform: translate(-6px, -15px) rotate(1deg);
+    opacity: 0.85;
+  }
+}
+
+@keyframes chaos-float-5 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(8px, -10px) rotate(-2deg);
+    opacity: 0.95;
+  }
+  50% {
+    transform: translate(-10px, 5px) rotate(1deg);
+    opacity: 0.85;
+  }
+  75% {
+    transform: translate(15px, 10px) rotate(-1deg);
+    opacity: 1;
+  }
+}
+
+.animate-chaos-float-1 {
+  animation: chaos-float-1 6s ease-in-out infinite;
+}
+
+.animate-chaos-float-2 {
+  animation: chaos-float-2 7s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.animate-chaos-float-3 {
+  animation: chaos-float-3 5.5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-chaos-float-4 {
+  animation: chaos-float-4 6.5s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.animate-chaos-float-5 {
+  animation: chaos-float-5 5s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+/* Orbit animations for solution visualization */
+@keyframes orbit-pulse-1 {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(-50%) translateY(-5px);
+    opacity: 1;
+  }
+}
+
+@keyframes orbit-pulse-2 {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(-50%) translateY(5px);
+    opacity: 1;
+  }
+}
+
+@keyframes orbit-pulse-3 {
+  0%, 100% {
+    transform: translateY(-50%) translateX(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-50%) translateX(-5px);
+    opacity: 1;
+  }
+}
+
+@keyframes orbit-pulse-4 {
+  0%, 100% {
+    transform: translateY(-50%) translateX(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-50%) translateX(5px);
+    opacity: 1;
+  }
+}
+
+.animate-orbit-1 {
+  animation: orbit-pulse-1 3s ease-in-out infinite;
+}
+
+.animate-orbit-2 {
+  animation: orbit-pulse-2 3s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.animate-orbit-3 {
+  animation: orbit-pulse-3 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-orbit-4 {
+  animation: orbit-pulse-4 3s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
 /* Glowing stat animation */
 .stat-glow-container {
   position: relative;
@@ -388,4 +572,107 @@ header.fixed::before {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+/* Problem cards with colored borders */
+.border-red-500\/20 {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+.border-red-500\/40 {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.bg-red-500\/5 {
+  background-color: rgba(239, 68, 68, 0.05);
+}
+.text-red-400 {
+  color: rgb(248, 113, 113);
+}
+
+.border-orange-500\/20 {
+  border-color: rgba(249, 115, 22, 0.2);
+}
+.border-orange-500\/40 {
+  border-color: rgba(249, 115, 22, 0.4);
+}
+.bg-orange-500\/5 {
+  background-color: rgba(249, 115, 22, 0.05);
+}
+.text-orange-400 {
+  color: rgb(251, 146, 60);
+}
+
+.border-yellow-500\/20 {
+  border-color: rgba(234, 179, 8, 0.2);
+}
+.border-yellow-500\/40 {
+  border-color: rgba(234, 179, 8, 0.4);
+}
+.bg-yellow-500\/5 {
+  background-color: rgba(234, 179, 8, 0.05);
+}
+.text-yellow-400 {
+  color: rgb(250, 204, 21);
+}
+
+.border-purple-500\/20 {
+  border-color: rgba(168, 85, 247, 0.2);
+}
+.border-purple-500\/40 {
+  border-color: rgba(168, 85, 247, 0.4);
+}
+.bg-purple-500\/5 {
+  background-color: rgba(168, 85, 247, 0.05);
+}
+.text-purple-400 {
+  color: rgb(192, 132, 252);
+}
+
+.border-pink-500\/20 {
+  border-color: rgba(236, 72, 153, 0.2);
+}
+.bg-pink-500\/5 {
+  background-color: rgba(236, 72, 153, 0.05);
+}
+.text-pink-400 {
+  color: rgb(244, 114, 182);
+}
+
+.border-pink-500\/30 {
+  border-color: rgba(236, 72, 153, 0.3);
+}
+.bg-pink-500\/10 {
+  background-color: rgba(236, 72, 153, 0.1);
+}
+
+.border-red-500\/30 {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.bg-red-500\/10 {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.border-orange-500\/30 {
+  border-color: rgba(249, 115, 22, 0.3);
+}
+.bg-orange-500\/10 {
+  background-color: rgba(249, 115, 22, 0.1);
+}
+
+.border-yellow-500\/30 {
+  border-color: rgba(234, 179, 8, 0.3);
+}
+.bg-yellow-500\/10 {
+  background-color: rgba(234, 179, 8, 0.1);
+}
+
+.border-purple-500\/30 {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+.bg-purple-500\/10 {
+  background-color: rgba(168, 85, 247, 0.1);
+}
+
+/* Line-through with custom color */
+.decoration-primary\/50 {
+  text-decoration-color: rgba(34, 211, 238, 0.5);
 }

@@ -3,13 +3,19 @@
 import { useState, useEffect, useRef } from "react";
 import {
   ArrowRight,
-  Brain,
-  BarChartBig as ChartBar,
+  FileArchive,
+  Mail,
+  FolderOpen,
+  MessageSquare,
+  Clock,
   Users,
-  Zap,
   Check,
-  Star,
   Loader2,
+  Link2,
+  Brain,
+  XCircle,
+  AlertTriangle,
+  Shuffle,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -23,8 +29,8 @@ export default function LandingPage() {
   const waitlistRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Typing animation state
-  const words = ["take-homes", "work trials"];
+  // Typing animation state for hero
+  const words = ["broken", "outdated", "chaos"];
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentText, setCurrentText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -38,7 +44,6 @@ export default function LandingPage() {
         if (currentText.length < word.length) {
           setCurrentText(word.slice(0, currentText.length + 1));
         } else {
-          // Wait before starting to delete
           setTimeout(() => setIsDeleting(true), 2000);
         }
       } else {
@@ -80,7 +85,7 @@ export default function LandingPage() {
 
       if (res.ok) {
         setStatus("success");
-        setMessage("You're on the list! Check your email for confirmation.");
+        setMessage("You're on the list. We'll be in touch.");
         setEmail("");
         setName("");
       } else {
@@ -105,23 +110,23 @@ export default function LandingPage() {
             </div>
             <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
               <a
-                href="#features"
+                href="#problem"
                 className="hover:text-foreground transition-colors hover:text-primary"
               >
-                Features
+                The Problem
               </a>
               <a
-                href="#how-it-works"
+                href="#solution"
                 className="hover:text-foreground transition-colors hover:text-primary"
               >
-                How it Works
+                Solution
               </a>
               <a
                 href="#waitlist"
                 className="px-4 py-1.5 bg-primary/10 border border-primary/30 rounded-full text-primary hover:bg-primary/20 transition-all"
                 onClick={openWaitlistForm}
               >
-                Join Waitlist
+                Get Early Access
               </a>
             </nav>
           </div>
@@ -133,25 +138,25 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section
           id="waitlist"
-          className="w-full py-24 md:py-32 flex justify-center px-4 animate-gradient"
+          className="w-full py-24 md:py-32 flex justify-center px-4"
         >
           <div className="max-w-4xl flex flex-col items-center text-center gap-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm animate-fade-in hover-glow">
-              <Star className="h-4 w-4 text-primary " />
               <span className="text-muted-foreground">
-                AI-Powered Candidate Evaluation
+                For teams that let candidates use AI
               </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight animate-fade-in-delay-1">
-              The fastest way to evaluate{" "}
-              <span className="text-primary text-glow inline-block w-[12ch] whitespace-nowrap">
+              Hiring is{" "}
+              <span className="text-primary text-glow inline-block min-w-[4ch]">
                 {currentText}
                 <span className="animate-blink">|</span>
               </span>
+              <br />
+              <span className="text-muted-foreground">in the age of AI.</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl animate-fade-in-delay-2">
-              Stop spending hours reviewing code submissions. Let AI analyze,
-              rank, and surface the best candidates automatically.
+              The problem is not that candidates use AI. The problem is you have no way to evaluate how they use it. No system to manage submissions. No consistency in reviews. Just inbox triage and lost context.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-delay-3">
               <button
@@ -159,37 +164,328 @@ export default function LandingPage() {
                 onClick={openWaitlistForm}
                 className="px-6 py-3 bg-primary text-primary-foreground font-medium rounded-lg flex items-center gap-2 hover:opacity-90 transition-all animate-pulse-glow hover:scale-105"
               >
-                Join the Waitlist <ArrowRight className="h-4 w-4" />
+                Get Early Access <ArrowRight className="h-4 w-4" />
               </button>
-              <a href="#how-it-works">
+              <a href="#problem">
                 <button className="px-6 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-all hover-glow hover:scale-105">
-                  See How it Works
+                  See the Problem
                 </button>
               </a>
             </div>
+          </div>
+        </section>
 
-            {showWaitlistForm && (
+        {/* Chaos Animation Section */}
+        <section className="w-full py-16 flex justify-center px-4 overflow-hidden">
+          <div className="relative w-full max-w-4xl h-32 md:h-40">
+            {/* Floating chaotic elements */}
+            <div className="absolute left-[5%] top-[20%] animate-chaos-float-1">
+              <div className="flex items-center gap-2 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                <FileArchive className="h-4 w-4" />
+                <span>submission_v3_final.zip</span>
+              </div>
+            </div>
+            <div className="absolute left-[25%] top-[60%] animate-chaos-float-2">
+              <div className="flex items-center gap-2 px-3 py-2 bg-orange-500/10 border border-orange-500/30 rounded-lg text-orange-400 text-sm">
+                <Mail className="h-4 w-4" />
+                <span>Re: Re: Re: Take-home</span>
+              </div>
+            </div>
+            <div className="absolute right-[30%] top-[10%] animate-chaos-float-3">
+              <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 text-sm">
+                <FolderOpen className="h-4 w-4" />
+                <span>Google Drive link expired</span>
+              </div>
+            </div>
+            <div className="absolute right-[5%] top-[50%] animate-chaos-float-4">
+              <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg text-purple-400 text-sm">
+                <MessageSquare className="h-4 w-4" />
+                <span>the api key is expired</span>
+              </div>
+            </div>
+            <div className="absolute left-[45%] top-[75%] animate-chaos-float-5">
+              <div className="flex items-center gap-2 px-3 py-2 bg-pink-500/10 border border-pink-500/30 rounded-lg text-pink-400 text-sm">
+                <Clock className="h-4 w-4" />
+                <span>2 weeks ago</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Problem Section */}
+        <section
+          id="problem"
+          className="w-full py-24 flex flex-col items-center px-4 bg-muted/20 border-y border-border"
+        >
+          <div className="w-full max-w-5xl">
+            <div className="flex flex-col items-center text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in">
+                Logistics are broken
+              </h2>
+              <p className="text-muted-foreground max-w-2xl animate-fade-in-delay-1">
+                Managing take-home assignments should not feel like this.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-16">
+              {[
+                {
+                  icon: XCircle,
+                  title: "Traditional assessments are gameable",
+                  description:
+                    "LeetCode and timed tests reward memorization and speed. AI makes them trivial to pass. They tell you nothing about how someone actually thinks.",
+                  color: "red",
+                },
+                {
+                  icon: Clock,
+                  title: "Reviews are slow and inconsistent",
+                  description:
+                    "Every reviewer evaluates differently. Some skim. Some over-index on style. There is no shared rubric, no calibration, no memory.",
+                  color: "orange",
+                },
+                {
+                  icon: Shuffle,
+                  title: "Context gets lost everywhere",
+                  description:
+                    "Submissions arrive via email, zip files, Google Drive links, GitHub repos. Notes live in Slack. Feedback lives in someone's head.",
+                  color: "yellow",
+                },
+                {
+                  icon: AlertTriangle,
+                  title: "No single source of truth",
+                  description:
+                    "There is no place where assignments, submissions, and reviews live together. Every hire starts from scratch.",
+                  color: "purple",
+                },
+              ].map((item, index) => (
+                <div
+                  key={item.title}
+                  className={`p-6 rounded-lg border border-${item.color}-500/20 bg-${item.color}-500/5 animate-card-${index + 1} hover:border-${item.color}-500/40 transition-all`}
+                >
+                  <item.icon className={`h-8 w-8 text-${item.color}-400 mb-4`} />
+                  <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                  <p className="text-muted-foreground text-sm">
+                    {item.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* What Slait Is NOT */}
+        <section className="w-full py-24 flex flex-col items-center px-4">
+          <div className="w-full max-w-4xl">
+            <div className="flex flex-col items-center text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in">
+                What Slait is not
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  label: "Not an ATS",
+                  description: "You already have one. We integrate, not replace.",
+                },
+                {
+                  label: "Not another coding test",
+                  description: "No LeetCode. No timed puzzles. No gotchas.",
+                },
+                {
+                  label: "Not an AI judge",
+                  description: "AI assists reviewers. It does not replace them.",
+                },
+              ].map((item, index) => (
+                <div
+                  key={item.label}
+                  className={`p-6 rounded-lg border border-border bg-card text-center animate-card-${index + 1}`}
+                >
+                  <div className="text-2xl font-bold text-muted-foreground mb-2 line-through decoration-primary/50">
+                    {item.label}
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    {item.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Solution Section */}
+        <section
+          id="solution"
+          className="w-full py-24 flex flex-col items-center px-4 animate-gradient"
+        >
+          <div className="w-full max-w-4xl">
+            <div className="flex flex-col items-center text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in">
+                One place for everything
+              </h2>
+              <p className="text-muted-foreground max-w-2xl animate-fade-in-delay-1">
+                Slait is a system of record for take-home assignments and work trials. A second brain for your reviewers. Built for teams that embrace AI.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                {[
+                  {
+                    icon: Link2,
+                    title: "One link per candidate",
+                    description:
+                      "No emails. No zip files. No chaos. Every submission lives in one place with full context preserved.",
+                  },
+                  {
+                    icon: Users,
+                    title: "Consistent reviews",
+                    description:
+                      "Shared rubrics. Calibrated scoring. Every reviewer sees the same context and evaluates the same way.",
+                  },
+                  {
+                    icon: Brain,
+                    title: "Evaluate reasoning, not output",
+                    description:
+                      "Good engineering is about tradeoffs, architecture decisions, and understanding. We help you see how candidates think.",
+                  },
+                ].map((item, index) => (
+                  <div
+                    key={item.title}
+                    className={`flex gap-4 p-4 rounded-lg border border-border bg-card/50 hover:bg-card transition-all hover-glow animate-card-${index + 1}`}
+                  >
+                    <div className="shrink-0">
+                      <item.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-1">{item.title}</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Visual representation */}
+              <div className="flex items-center justify-center">
+                <div className="relative w-full max-w-sm aspect-square">
+                  {/* Central hub */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center animate-pulse-glow">
+                    <Brain className="h-10 w-10 text-primary" />
+                  </div>
+
+                  {/* Orbiting elements */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 animate-orbit-1">
+                    <div className="px-3 py-1.5 bg-card border border-border rounded-lg text-xs">
+                      Assignments
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 animate-orbit-2">
+                    <div className="px-3 py-1.5 bg-card border border-border rounded-lg text-xs">
+                      Submissions
+                    </div>
+                  </div>
+                  <div className="absolute top-1/2 left-0 -translate-y-1/2 animate-orbit-3">
+                    <div className="px-3 py-1.5 bg-card border border-border rounded-lg text-xs">
+                      Reviews
+                    </div>
+                  </div>
+                  <div className="absolute top-1/2 right-0 -translate-y-1/2 animate-orbit-4">
+                    <div className="px-3 py-1.5 bg-card border border-border rounded-lg text-xs">
+                      Context
+                    </div>
+                  </div>
+
+                  {/* Connection lines */}
+                  <svg className="absolute inset-0 w-full h-full" style={{ zIndex: -1 }}>
+                    <line x1="50%" y1="15%" x2="50%" y2="40%" stroke="rgba(34, 211, 238, 0.3)" strokeWidth="1" strokeDasharray="4" />
+                    <line x1="50%" y1="60%" x2="50%" y2="85%" stroke="rgba(34, 211, 238, 0.3)" strokeWidth="1" strokeDasharray="4" />
+                    <line x1="15%" y1="50%" x2="40%" y2="50%" stroke="rgba(34, 211, 238, 0.3)" strokeWidth="1" strokeDasharray="4" />
+                    <line x1="60%" y1="50%" x2="85%" y2="50%" stroke="rgba(34, 211, 238, 0.3)" strokeWidth="1" strokeDasharray="4" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Who This Is For */}
+        <section className="w-full py-24 flex flex-col items-center px-4 bg-muted/20 border-y border-border">
+          <div className="w-full max-w-4xl">
+            <div className="flex flex-col items-center text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in">
+                Built for AI-native teams
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 text-center">
+              {[
+                {
+                  title: "Founders",
+                  description: "Who need to hire fast without sacrificing signal",
+                },
+                {
+                  title: "Engineering Managers",
+                  description: "Who want consistent, defensible hiring decisions",
+                },
+                {
+                  title: "Hiring Teams",
+                  description: "Who allow Cursor, Copilot, Claude and care about real ability",
+                },
+              ].map((item, index) => (
+                <div
+                  key={item.title}
+                  className={`p-6 rounded-lg border border-primary/20 bg-primary/5 animate-card-${index + 1}`}
+                >
+                  <h3 className="font-semibold text-lg mb-2 text-primary">
+                    {item.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {item.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Vision Section */}
+        <section className="w-full py-24 flex flex-col items-center px-4">
+          <div className="w-full max-w-3xl text-center">
+            <blockquote className="text-2xl md:text-3xl font-medium text-foreground leading-relaxed animate-fade-in">
+              &ldquo;The future of technical hiring is not about catching people using AI. It is about understanding how they leverage it to solve real problems.&rdquo;
+            </blockquote>
+            <p className="mt-6 text-muted-foreground animate-fade-in-delay-1">
+              We are building the infrastructure for that future.
+            </p>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="w-full py-24 flex flex-col items-center px-4 animate-gradient">
+          <div className="w-full max-w-xl flex flex-col items-center text-center gap-6">
+            {showWaitlistForm ? (
               <div
                 ref={waitlistRef}
-                className="w-full max-w-xl flex flex-col items-center text-center gap-6 animate-fade-in-delay-3"
+                className="w-full flex flex-col items-center text-center gap-6 animate-fade-in"
               >
-                <h2 className="text-2xl md:text-3xl font-bold animate-fade-in">
-                  Join the Waitlist
+                <h2 className="text-2xl md:text-3xl font-bold">
+                  Get early access
                 </h2>
-                <p className="text-muted-foreground animate-fade-in-delay-1">
-                  Be the first to know when we launch. Get early access and
-                  exclusive updates.
+                <p className="text-muted-foreground">
+                  We are rolling out to a small group of teams. Join the waitlist to be first in line.
                 </p>
 
                 {status === "success" ? (
-                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 text-green-400 animate-scale-up w-full">
+                  <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 text-primary animate-scale-up w-full">
                     <Check className="h-8 w-8 mx-auto mb-2" />
                     <p className="font-medium">{message}</p>
                   </div>
                 ) : (
                   <form
                     onSubmit={handleSubmit}
-                    className="w-full space-y-4 animate-fade-in-delay-2"
+                    className="w-full space-y-4"
                   >
                     <input
                       ref={nameInputRef}
@@ -201,7 +497,7 @@ export default function LandingPage() {
                     />
                     <input
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder="Work email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -231,276 +527,40 @@ export default function LandingPage() {
                   </form>
                 )}
 
-                <p className="text-xs text-muted-foreground animate-fade-in-delay-3">
-                  We respect your privacy. No spam, ever.
+                <p className="text-xs text-muted-foreground">
+                  No spam. Just updates when we launch.
                 </p>
               </div>
+            ) : (
+              <>
+                <h2 className="text-2xl md:text-3xl font-bold animate-fade-in">
+                  Ready to fix hiring?
+                </h2>
+                <p className="text-muted-foreground animate-fade-in-delay-1">
+                  Join the waitlist for early access.
+                </p>
+                <button
+                  type="button"
+                  onClick={openWaitlistForm}
+                  className="px-8 py-4 bg-primary text-primary-foreground font-medium rounded-lg flex items-center gap-2 hover:opacity-90 transition-all animate-pulse-glow hover:scale-105"
+                >
+                  Get Early Access <ArrowRight className="h-4 w-4" />
+                </button>
+              </>
             )}
-
-            {/* Glowing Stats */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-6 animate-fade-in-delay-3">
-              <div className="stat-glow-container stat-glow-secondary relative px-8 py-4 rounded-2xl border border-orange-500/30 bg-orange-500/5">
-                <div className="stat-glow-ring-secondary"></div>
-                <div className="flex items-center gap-4">
-                  <span className="text-5xl md:text-6xl font-bold text-orange-400 animate-number-glow-secondary">75%</span>
-                  <span className="text-lg text-muted-foreground text-left max-w-[200px]">of startups use take-homes</span>
-                </div>
-              </div>
-              <div className="stat-glow-container relative px-8 py-4 rounded-2xl border border-primary/30 bg-primary/5">
-                <div className="stat-glow-ring"></div>
-                <div className="flex items-center gap-4">
-                  <span className="text-5xl md:text-6xl font-bold text-primary text-glow animate-number-glow">90%</span>
-                  <span className="text-lg text-muted-foreground text-left max-w-[200px]">of startups use work trials</span>
-                </div>
-              </div>
-            </div>
-
           </div>
         </section>
-
-        {/* Features Section */}
-        <section
-          id="features"
-          className="w-full py-24 flex flex-col items-center px-4"
-        >
-          <div className="w-full max-w-6xl flex flex-col items-center">
-            <div className="flex flex-col items-center text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in">
-                Everything you need to hire better
-              </h2>
-              <p className="text-muted-foreground max-w-2xl animate-fade-in-delay-1">
-                Comprehensive tools to create assessments, evaluate submissions,
-                and make data-driven hiring decisions.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 w-full">
-              {[
-                {
-                  icon: Brain,
-                  title: "AI-Powered Analysis",
-                  description:
-                    "Automatically evaluate code quality, test coverage, architecture decisions, and best practices.",
-                },
-                {
-                  icon: ChartBar,
-                  title: "Real-time Ranking",
-                  description:
-                    "Adjust skill weights and instantly see how candidates stack up against each other.",
-                },
-                {
-                  icon: Users,
-                  title: "Role-Based Assessments",
-                  description:
-                    "Create custom assessments for any role with tailored evaluation criteria.",
-                },
-                {
-                  icon: Zap,
-                  title: "Instant Feedback",
-                  description:
-                    "Get detailed insights on each submission including strengths, weaknesses, and a TLDR summary.",
-                },
-                {
-                  icon: Check,
-                  title: "Test Case Validation",
-                  description:
-                    "Auto-run test cases and track pass/fail rates for objective evaluation.",
-                },
-                {
-                  icon: Star,
-                  title: "Candidate Experience",
-                  description:
-                    "Shareable assessment links with live coding environments for candidates.",
-                },
-              ].map((feature, index) => (
-                <div
-                  key={feature.title}
-                  className={`p-6 rounded-lg border border-border bg-card hover:bg-muted/50 transition-all duration-300 hover:scale-[1.05] hover-glow animate-card-${index + 1}`}
-                >
-                  <feature.icon className="h-10 w-10 text-primary mb-4 " />
-                  <h3 className="font-semibold text-lg mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How it Works Section */}
-        <section
-          id="how-it-works"
-          className="bg-muted/30 border-y border-border py-24 w-full flex flex-col items-center px-4 animate-gradient"
-        >
-          <div className="w-full max-w-4xl flex flex-col items-center">
-            <div className="flex flex-col items-center text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in">
-                How it works
-              </h2>
-              <p className="text-muted-foreground max-w-2xl animate-fade-in-delay-1">
-                Get started in minutes with a simple three-step workflow.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 w-full">
-              {[
-                {
-                  step: "01",
-                  title: "Create Your Role",
-                  description:
-                    "Define the skills and weights that matter most for the position you're hiring for.",
-                },
-                {
-                  step: "02",
-                  title: "Design Assessments",
-                  description:
-                    "Use AI to generate test cases and evaluation metrics, or create your own from scratch.",
-                },
-                {
-                  step: "03",
-                  title: "Review Candidates",
-                  description:
-                    "AI analyzes submissions and ranks candidates. Adjust weights to surface the best fits.",
-                },
-              ].map((item, index) => (
-                <div
-                  key={item.step}
-                  className={`relative text-center animate-card-${index + 1}`}
-                >
-                  <div className="text-6xl font-bold text-primary/20 mb-4 text-glow">
-                    {item.step}
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm">
-                    {item.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing Section - Commented Out
-        <section
-          id="pricing"
-          className="w-full py-24 flex flex-col items-center px-4"
-        >
-          <div className="w-full max-w-5xl flex flex-col items-center">
-            <div className="flex flex-col items-center text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Simple, transparent pricing
-              </h2>
-              <p className="text-muted-foreground max-w-2xl">
-                Start free and scale as you grow. No hidden fees.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 w-full">
-              {[
-                {
-                  name: "Starter",
-                  price: "Free",
-                  description: "Perfect for small teams just getting started.",
-                  features: [
-                    "Up to 3 roles",
-                    "10 assessments/month",
-                    "Basic AI analysis",
-                    "Email support",
-                  ],
-                },
-                {
-                  name: "Pro",
-                  price: "$49",
-                  period: "/month",
-                  description: "For growing teams with more hiring needs.",
-                  features: [
-                    "Unlimited roles",
-                    "Unlimited assessments",
-                    "Advanced AI insights",
-                    "Priority support",
-                    "Custom evaluation metrics",
-                  ],
-                  popular: true,
-                },
-                {
-                  name: "Enterprise",
-                  price: "Custom",
-                  description:
-                    "For large organizations with custom requirements.",
-                  features: [
-                    "Everything in Pro",
-                    "SSO & SAML",
-                    "Dedicated account manager",
-                    "Custom integrations",
-                    "SLA guarantee",
-                  ],
-                },
-              ].map((plan) => (
-                <div
-                  key={plan.name}
-                  className={`p-8 rounded-lg border relative transition-all duration-200 hover:scale-[1.01] ${
-                    plan.popular
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-card"
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-medium rounded-full">
-                      Most Popular
-                    </div>
-                  )}
-                  <h3 className="font-semibold text-lg">{plan.name}</h3>
-                  <div className="mt-4 mb-2">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    {plan.period && (
-                      <span className="text-muted-foreground">
-                        {plan.period}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    {plan.description}
-                  </p>
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        <Check className="h-4 w-4 text-primary shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <a href="#waitlist">
-                    <button
-                      className={`w-full py-2 rounded-lg font-medium transition-colors ${
-                        plan.popular
-                          ? "bg-primary text-primary-foreground hover:opacity-90"
-                          : "border border-border hover:bg-muted"
-                      }`}
-                    >
-                      Join Waitlist
-                    </button>
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        */}
-
       </main>
 
       {/* Footer */}
       <footer className="border-t border-border py-12 px-4 animate-fade-in">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary " />
+            <Brain className="h-5 w-5 text-primary" />
             <span className="font-semibold">Slait</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Built for hiring teams who value their time.
+            The system of record for technical hiring.
           </p>
         </div>
       </footer>

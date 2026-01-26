@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Slait - AI-Powered Take-Home Assessment Evaluation",
-  description: "Stop spending hours reviewing code submissions. Let AI analyze, rank, and surface the best candidates automatically.",
+  title: "Slait - The System of Record for Technical Hiring",
+  description: "One place for take-home assignments, work trials, and reviews. Built for AI-native teams that care about evaluating real engineering ability.",
 };
 
 export default function RootLayout({
