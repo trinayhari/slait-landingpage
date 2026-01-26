@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ArrowRight,
   Brain,
@@ -19,6 +19,9 @@ export default function LandingPage() {
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [message, setMessage] = useState("");
+  const [showWaitlistForm, setShowWaitlistForm] = useState(false);
+  const waitlistRef = useRef<HTMLDivElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   // Typing animation state
   const words = ["take-homes", "work trials"];
@@ -50,6 +53,17 @@ export default function LandingPage() {
 
     return () => clearTimeout(timeout);
   }, [currentText, isDeleting, currentWordIndex, words]);
+
+  const openWaitlistForm = () => {
+    setShowWaitlistForm(true);
+    setTimeout(() => {
+      waitlistRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      nameInputRef.current?.focus();
+    }, 50);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +119,7 @@ export default function LandingPage() {
               <a
                 href="#waitlist"
                 className="px-4 py-1.5 bg-primary/10 border border-primary/30 rounded-full text-primary hover:bg-primary/20 transition-all"
+                onClick={openWaitlistForm}
               >
                 Join Waitlist
               </a>
@@ -116,7 +131,10 @@ export default function LandingPage() {
         <div className="h-20"></div>
 
         {/* Hero Section */}
-        <section className="w-full py-24 md:py-32 flex justify-center px-4 animate-gradient">
+        <section
+          id="waitlist"
+          className="w-full py-24 md:py-32 flex justify-center px-4 animate-gradient"
+        >
           <div className="max-w-4xl flex flex-col items-center text-center gap-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm animate-fade-in hover-glow">
               <Star className="h-4 w-4 text-primary " />
@@ -126,7 +144,7 @@ export default function LandingPage() {
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight animate-fade-in-delay-1">
               The fastest way to evaluate{" "}
-              <span className="text-primary text-glow">
+              <span className="text-primary text-glow inline-block w-[12ch] whitespace-nowrap">
                 {currentText}
                 <span className="animate-blink">|</span>
               </span>
@@ -136,17 +154,88 @@ export default function LandingPage() {
               rank, and surface the best candidates automatically.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-delay-3">
-              <a href="#waitlist">
-                <button className="px-6 py-3 bg-primary text-primary-foreground font-medium rounded-lg flex items-center gap-2 hover:opacity-90 transition-all animate-pulse-glow hover:scale-105">
-                  Join the Waitlist <ArrowRight className="h-4 w-4" />
-                </button>
-              </a>
+              <button
+                type="button"
+                onClick={openWaitlistForm}
+                className="px-6 py-3 bg-primary text-primary-foreground font-medium rounded-lg flex items-center gap-2 hover:opacity-90 transition-all animate-pulse-glow hover:scale-105"
+              >
+                Join the Waitlist <ArrowRight className="h-4 w-4" />
+              </button>
               <a href="#how-it-works">
                 <button className="px-6 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-all hover-glow hover:scale-105">
                   See How it Works
                 </button>
               </a>
             </div>
+
+            {showWaitlistForm && (
+              <div
+                ref={waitlistRef}
+                className="w-full max-w-xl flex flex-col items-center text-center gap-6 animate-fade-in-delay-3"
+              >
+                <h2 className="text-2xl md:text-3xl font-bold animate-fade-in">
+                  Join the Waitlist
+                </h2>
+                <p className="text-muted-foreground animate-fade-in-delay-1">
+                  Be the first to know when we launch. Get early access and
+                  exclusive updates.
+                </p>
+
+                {status === "success" ? (
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 text-green-400 animate-scale-up w-full">
+                    <Check className="h-8 w-8 mx-auto mb-2" />
+                    <p className="font-medium">{message}</p>
+                  </div>
+                ) : (
+                  <form
+                    onSubmit={handleSubmit}
+                    className="w-full space-y-4 animate-fade-in-delay-2"
+                  >
+                    <input
+                      ref={nameInputRef}
+                      type="text"
+                      placeholder="Your name (optional)"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all hover-glow"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all hover-glow"
+                    />
+                    <button
+                      type="submit"
+                      disabled={status === "loading"}
+                      className="w-full py-3 bg-primary text-primary-foreground font-medium rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 animate-pulse-glow hover:scale-[1.02]"
+                    >
+                      {status === "loading" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Joining...
+                        </>
+                      ) : (
+                        <>
+                          Join Waitlist <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                    {status === "error" && (
+                      <p className="text-red-400 text-sm animate-fade-in">
+                        {message}
+                      </p>
+                    )}
+                  </form>
+                )}
+
+                <p className="text-xs text-muted-foreground animate-fade-in-delay-3">
+                  We respect your privacy. No spam, ever.
+                </p>
+              </div>
+            )}
 
             {/* Glowing Stats */}
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-6 animate-fade-in-delay-3">
@@ -165,6 +254,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+
           </div>
         </section>
 
@@ -400,69 +490,6 @@ export default function LandingPage() {
         </section>
         */}
 
-        {/* Waitlist Section */}
-        <section
-          id="waitlist"
-          className="bg-primary/10 border-t border-border w-full py-24 flex flex-col items-center px-4"
-        >
-          <div className="w-full max-w-xl flex flex-col items-center text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in">
-              Join the Waitlist
-            </h2>
-            <p className="text-muted-foreground mb-8 animate-fade-in-delay-1">
-              Be the first to know when we launch. Get early access and
-              exclusive updates.
-            </p>
-
-            {status === "success" ? (
-              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 text-green-400 animate-scale-up">
-                <Check className="h-8 w-8 mx-auto mb-2" />
-                <p className="font-medium">{message}</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="w-full space-y-4 animate-fade-in-delay-2">
-                <input
-                  type="text"
-                  placeholder="Your name (optional)"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all hover-glow"
-                />
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all hover-glow"
-                />
-                <button
-                  type="submit"
-                  disabled={status === "loading"}
-                  className="w-full py-3 bg-primary text-primary-foreground font-medium rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 animate-pulse-glow hover:scale-[1.02]"
-                >
-                  {status === "loading" ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Joining...
-                    </>
-                  ) : (
-                    <>
-                      Join Waitlist <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-                {status === "error" && (
-                  <p className="text-red-400 text-sm animate-fade-in">{message}</p>
-                )}
-              </form>
-            )}
-
-            <p className="text-xs text-muted-foreground mt-6 animate-fade-in-delay-3">
-              We respect your privacy. No spam, ever.
-            </p>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
