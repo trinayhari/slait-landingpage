@@ -8,7 +8,7 @@ export default function Header() {
         <span className="text-5xl font-semibold text-primary tracking-tight">
           slait
         </span>
-        <span className="ml-2 w-[6px] h-11 bg-primary animate-cursor-blink" />
+        <span className="ml-2 w-[8px] h-9 bg-primary animate-cursor-blink" />
       </div>
 
       {/* Terminal prompt indicator */}
