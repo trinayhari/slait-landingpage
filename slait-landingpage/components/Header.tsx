@@ -15,6 +15,11 @@ export default function Header() {
       <div className="text-sm font-mono text-primary/70">
         $ slait analyze --session <span className="text-primary/50 animate-pulse">[awaiting file]</span>
       </div>
+
+      {/* Tagline */}
+      <p className="text-lg text-muted-foreground">
+        How good of a vibecoder are you?
+      </p>
     </div>
   )
 }

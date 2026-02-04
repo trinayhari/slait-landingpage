@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Header from '@/components/Header'
+import RotatingText from '@/components/RotatingText'
 import UploadZone from '@/components/UploadZone'
 import CandidateGallery from '@/components/CandidateGallery'
 import AnalysisResults from '@/components/AnalysisResults'
@@ -70,6 +71,7 @@ export default function Home() {
           <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 flex-1">
             {/* Upload Zone - Main CTA */}
             <div className="w-full lg:w-1/2">
+              <RotatingText />
               <UploadZone
                 isAnalyzing={isAnalyzing}
                 setIsAnalyzing={setIsAnalyzing}
