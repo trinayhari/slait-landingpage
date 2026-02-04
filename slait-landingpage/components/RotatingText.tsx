@@ -38,7 +38,7 @@ export default function RotatingText() {
   return (
     <div className="text-center mb-6">
       <p className="text-xl font-mono text-foreground">
-        Analyze vibecoding chats with{' '}
+        Analyze your chats with{' '}
         <span className="text-primary scan-glow">{displayText}</span>
         <span className="inline-block w-[2px] h-5 bg-primary ml-0.5 align-middle animate-cursor-blink" />
       </p>
