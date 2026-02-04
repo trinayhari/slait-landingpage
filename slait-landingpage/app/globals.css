@@ -1,0 +1,234 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #0a0e14;
+  --foreground: #e8eef5;
+  --card: #111820;
+  --card-foreground: #e8eef5;
+  --popover: #111820;
+  --popover-foreground: #e8eef5;
+  --primary: #00d4ff;
+  --primary-foreground: #0a0e14;
+  --secondary: #1a2332;
+  --secondary-foreground: #e8eef5;
+  --muted: #2d3a48;
+  --muted-foreground: #8a96a8;
+  --accent: #00d4ff;
+  --accent-foreground: #0a0e14;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #ffe8e8;
+  --border: #1f2d3a;
+  --input: #111820;
+  --ring: #00d4ff;
+  --chart-1: #00d4ff;
+  --chart-2: #748aa6;
+  --chart-3: #4d5e73;
+  --chart-4: #2d3a48;
+  --chart-5: #1a2332;
+  --radius: 0.5rem;
+  --sidebar: #111820;
+  --sidebar-foreground: #e8eef5;
+  --sidebar-primary: #00d4ff;
+  --sidebar-primary-foreground: #0a0e14;
+  --sidebar-accent: #00d4ff;
+  --sidebar-accent-foreground: #0a0e14;
+  --sidebar-border: #1f2d3a;
+  --sidebar-ring: #00d4ff;
+}
+
+.dark {
+  --background: #0a0e14;
+  --foreground: #e8eef5;
+  --card: #111820;
+  --card-foreground: #e8eef5;
+  --popover: #111820;
+  --popover-foreground: #e8eef5;
+  --primary: #00d4ff;
+  --primary-foreground: #0a0e14;
+  --secondary: #1a2332;
+  --secondary-foreground: #e8eef5;
+  --muted: #2d3a48;
+  --muted-foreground: #8a96a8;
+  --accent: #00d4ff;
+  --accent-foreground: #0a0e14;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #ffe8e8;
+  --border: #1f2d3a;
+  --input: #111820;
+  --ring: #00d4ff;
+  --chart-1: #00d4ff;
+  --chart-2: #748aa6;
+  --chart-3: #4d5e73;
+  --chart-4: #2d3a48;
+  --chart-5: #1a2332;
+  --sidebar: #111820;
+  --sidebar-foreground: #e8eef5;
+  --sidebar-primary: #00d4ff;
+  --sidebar-primary-foreground: #0a0e14;
+  --sidebar-accent: #00d4ff;
+  --sidebar-accent-foreground: #0a0e14;
+  --sidebar-border: #1f2d3a;
+  --sidebar-ring: #00d4ff;
+}
+
+@theme inline {
+  --font-sans: 'Geist', 'Geist Fallback';
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Terminal-style solid background */
+.terminal-bg {
+  background-color: #0a0e14;
+}
+
+/* Static pixelated dither pattern - always exists on page */
+.pixel-dither {
+  background-image: 
+    linear-gradient(45deg, rgba(0, 212, 255, 0.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(0, 212, 255, 0.12) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(0, 212, 255, 0.12) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(0, 212, 255, 0.12) 75%);
+  background-size: 4px 4px;
+  background-position: 0 0, 0 2px, 2px -2px, -2px 0px;
+}
+
+@layer utilities {
+  /* Large terminal grid overlay */
+  .grid-overlay {
+    background-image: 
+      linear-gradient(0deg, transparent 49%, rgba(0, 212, 255, 0.06) 50%, transparent 51%),
+      linear-gradient(90deg, transparent 49%, rgba(0, 212, 255, 0.06) 50%, transparent 51%);
+    background-size: 120px 120px;
+  }
+
+  /* Terminal text effect */
+  .terminal-text {
+    font-family: 'Geist Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* Glow animation */
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+    }
+  }
+
+  .glow-pulse {
+    animation: glow-pulse 3s infinite;
+  }
+
+  /* Fade in slide up */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    animation: fade-in-up 0.6s ease-out;
+  }
+
+  /* Subtle float animation */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Scan lines */
+  @keyframes scan {
+    0% {
+      text-shadow: 0 0 0 rgba(0, 212, 255, 0.5);
+    }
+    50% {
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+    100% {
+      text-shadow: 0 0 0 rgba(0, 212, 255, 0.5);
+    }
+  }
+
+  .scan-glow {
+    animation: scan 4s ease-in-out infinite;
+  }
+
+  /* Border accent animation */
+  @keyframes border-glow {
+    0%, 100% {
+      border-color: rgba(0, 212, 255, 0.3);
+      box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.2) inset;
+    }
+    50% {
+      border-color: rgba(0, 212, 255, 0.8);
+      box-shadow: 0 0 8px rgba(0, 212, 255, 0.3) inset;
+    }
+  }
+
+  .border-glow {
+    animation: border-glow 3s ease-in-out infinite;
+  }
+}
