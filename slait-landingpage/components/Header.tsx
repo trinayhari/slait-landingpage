@@ -5,11 +5,10 @@ export default function Header() {
     <div className="w-full flex flex-col items-center justify-center text-center space-y-4 fade-in-up">
       {/* Logo */}
       <div className="flex items-center justify-center">
-        <img 
-          src="/images/slait.jpg" 
-          alt="Slait"
-          className="h-16 w-auto"
-        />
+        <span className="text-5xl font-semibold text-primary tracking-tight">
+          slait
+        </span>
+        <span className="ml-2 w-[8px] h-9 bg-primary animate-cursor-blink" />
       </div>
 
       {/* Terminal prompt indicator */}

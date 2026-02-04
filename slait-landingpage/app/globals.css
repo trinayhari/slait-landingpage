@@ -231,4 +231,18 @@
   .border-glow {
     animation: border-glow 3s ease-in-out infinite;
   }
+
+  /* Terminal cursor blink */
+  @keyframes cursor-blink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
+  }
+
+  .animate-cursor-blink {
+    animation: cursor-blink 1s step-end infinite;
+  }
 }
