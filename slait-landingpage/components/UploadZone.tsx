@@ -3,17 +3,20 @@
 import React from "react"
 
 import { useRef, useState } from 'react'
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, AlertTriangle } from 'lucide-react'
+import { AIUsageAnalysis } from '@/lib/types'
 
 interface UploadZoneProps {
   isAnalyzing: boolean
   setIsAnalyzing: (value: boolean) => void
+  onAnalysisComplete: (analysis: AIUsageAnalysis) => void
 }
 
-export default function UploadZone({ isAnalyzing, setIsAnalyzing }: UploadZoneProps) {
+export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComplete }: UploadZoneProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [fileName, setFileName] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault()
@@ -43,14 +46,36 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing }: UploadZonePr
     }
   }
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     setFileName(file.name)
+    setError(null)
     setIsAnalyzing(true)
 
-    // Simulate analysis
-    setTimeout(() => {
+    try {
+      // Read the file content
+      const content = await file.text()
+
+      // Call the API
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ chatLog: content }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze chat log')
+      }
+
+      const analysis: AIUsageAnalysis = await response.json()
+      onAnalysisComplete(analysis)
+    } catch (err) {
+      console.error('Error analyzing file:', err)
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
       setIsAnalyzing(false)
-    }, 3000)
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,6 +143,18 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing }: UploadZonePr
               <p className="text-sm text-muted-foreground mt-1">
                 {fileName}
               </p>
+            </div>
+          </div>
+        ) : error ? (
+          // Error state
+          <div className="flex flex-col items-center justify-center space-y-3">
+            <div className="w-12 h-12 rounded-full border-2 border-red-500/50 flex items-center justify-center bg-red-500/10">
+              <AlertTriangle className="w-6 h-6 text-red-400" />
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-mono text-red-400">Analysis failed</p>
+              <p className="text-sm text-muted-foreground mt-1">{error}</p>
+              <p className="text-xs text-muted-foreground mt-2">Click to try again</p>
             </div>
           </div>
         ) : fileName ? (

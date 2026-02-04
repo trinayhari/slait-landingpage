@@ -4,10 +4,13 @@ import { useState, useEffect, useRef } from 'react'
 import Header from '@/components/Header'
 import UploadZone from '@/components/UploadZone'
 import CandidateGallery from '@/components/CandidateGallery'
+import AnalysisResults from '@/components/AnalysisResults'
 import Footer from '@/components/Footer'
+import { AIUsageAnalysis } from '@/lib/types'
 
 export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<AIUsageAnalysis | null>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const rafRef = useRef<number>(0)
 
@@ -56,17 +59,30 @@ export default function Home() {
         <Header />
 
         {/* Main Content */}
-        <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 flex-1">
-          {/* Upload Zone - Main CTA */}
-          <div className="w-full lg:w-1/2">
-            <UploadZone isAnalyzing={isAnalyzing} setIsAnalyzing={setIsAnalyzing} />
+        {analysisResult ? (
+          <div className="w-full flex-1 py-8">
+            <AnalysisResults
+              analysis={analysisResult}
+              onReset={() => setAnalysisResult(null)}
+            />
           </div>
+        ) : (
+          <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 flex-1">
+            {/* Upload Zone - Main CTA */}
+            <div className="w-full lg:w-1/2">
+              <UploadZone
+                isAnalyzing={isAnalyzing}
+                setIsAnalyzing={setIsAnalyzing}
+                onAnalysisComplete={setAnalysisResult}
+              />
+            </div>
 
-          {/* Candidate Gallery */}
-          <div className="w-full lg:w-1/2">
-            <CandidateGallery />
+            {/* Candidate Gallery */}
+            <div className="w-full lg:w-1/2">
+              <CandidateGallery />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Footer */}
         <Footer />
