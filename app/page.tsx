@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Header from '@/components/Header'
 import RotatingText from '@/components/RotatingText'
 import UploadZone from '@/components/UploadZone'
+import EarlyAccess from '@/components/EarlyAccess'
 import CandidateGallery from '@/components/CandidateGallery'
 import AnalysisResults from '@/components/AnalysisResults'
 import Footer from '@/components/Footer'
@@ -12,6 +13,7 @@ import { AIUsageAnalysis } from '@/lib/types'
 export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AIUsageAnalysis | null>(null)
+  const [fileName, setFileName] = useState<string | null>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const rafRef = useRef<number>(0)
 
@@ -55,9 +57,9 @@ export default function Home() {
         }}
       />
 
-      <div className="relative z-10 flex flex-col items-center justify-between min-h-screen px-4 py-6">
+      <div className="relative z-10 flex flex-col items-center justify-between min-h-screen px-4 py-4">
         {/* Header */}
-        <Header />
+        <Header fileName={fileName} />
 
         {/* Main Content */}
         {analysisResult ? (
@@ -68,20 +70,32 @@ export default function Home() {
             />
           </div>
         ) : (
-          <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 flex-1">
-            {/* Upload Zone - Main CTA */}
-            <div className="w-full lg:w-1/2">
-              <RotatingText />
-              <UploadZone
-                isAnalyzing={isAnalyzing}
-                setIsAnalyzing={setIsAnalyzing}
-                onAnalysisComplete={setAnalysisResult}
-              />
-            </div>
+          <div className="w-full max-w-6xl flex flex-col items-center justify-center gap-4 flex-1">
+            {/* Rotating Text - Above boxes */}
+            <RotatingText />
 
-            {/* Candidate Gallery */}
-            <div className="w-full lg:w-1/2">
-              <CandidateGallery />
+            {/* Three columns */}
+            <div className="w-full flex flex-col lg:flex-row items-stretch justify-center gap-6">
+              {/* Candidate Gallery - Left */}
+              <div className="w-full lg:w-1/3 flex">
+                <CandidateGallery />
+              </div>
+
+              {/* Upload Zone - Center */}
+              <div className="w-full lg:w-1/3 flex">
+                <UploadZone
+                  isAnalyzing={isAnalyzing}
+                  setIsAnalyzing={setIsAnalyzing}
+                  onAnalysisComplete={setAnalysisResult}
+                  fileName={fileName}
+                  setFileName={setFileName}
+                />
+              </div>
+
+              {/* Early Access - Right */}
+              <div className="w-full lg:w-1/3 flex">
+                <EarlyAccess />
+              </div>
             </div>
           </div>
         )}

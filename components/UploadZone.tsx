@@ -2,21 +2,50 @@
 
 import React from "react"
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { ArrowUp, AlertTriangle } from 'lucide-react'
 import { AIUsageAnalysis } from '@/lib/types'
+
+const tools = ['Cursor', 'Codex', 'Claude Code']
 
 interface UploadZoneProps {
   isAnalyzing: boolean
   setIsAnalyzing: (value: boolean) => void
   onAnalysisComplete: (analysis: AIUsageAnalysis) => void
+  fileName: string | null
+  setFileName: (value: string | null) => void
 }
 
-export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComplete }: UploadZoneProps) {
+export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComplete, fileName, setFileName }: UploadZoneProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [fileName, setFileName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [toolIndex, setToolIndex] = useState(0)
+  const [displayText, setDisplayText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const currentTool = tools[toolIndex]
+
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        if (displayText.length < currentTool.length) {
+          setDisplayText(currentTool.slice(0, displayText.length + 1))
+        } else {
+          setTimeout(() => setIsDeleting(true), 2000)
+        }
+      } else {
+        if (displayText.length > 0) {
+          setDisplayText(displayText.slice(0, -1))
+        } else {
+          setIsDeleting(false)
+          setToolIndex((prev) => (prev + 1) % tools.length)
+        }
+      }
+    }, isDeleting ? 50 : 100)
+
+    return () => clearTimeout(timeout)
+  }, [displayText, isDeleting, toolIndex])
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault()
@@ -90,8 +119,8 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
   }
 
   return (
-    <div 
-      className={`relative w-full py-12 px-8 transition-all duration-300 ${
+    <div
+      className={`relative w-full py-4 px-2 transition-all duration-300 ${
         isDragging ? 'scale-105' : 'scale-100'
       }`}
       onDragEnter={handleDragEnter}
@@ -107,8 +136,8 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
       }} />
 
       {/* Main upload box */}
-      <div 
-        className={`relative bg-card/50 border border-border rounded-lg p-12 transition-all duration-300 backdrop-blur-sm ${
+      <div
+        className={`relative bg-card/50 border border-border rounded-lg p-6 transition-all duration-300 backdrop-blur-sm ${
           isDragging
             ? 'bg-primary/10 shadow-lg shadow-primary/30'
             : 'hover:bg-secondary/40'
@@ -124,7 +153,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
           ref={fileInputRef}
           type="file"
           onChange={handleInputChange}
-          accept=".json,.txt,.log,.md,.js,.ts,.jsx,.tsx,.py"
+          accept=".md"
           className="hidden"
         />
 
@@ -171,27 +200,32 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
           </div>
         ) : (
           // Default state
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${
-              isDragging 
-                ? 'border-primary bg-primary/20' 
+          <div className="flex flex-col items-center justify-center space-y-3">
+            <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${
+              isDragging
+                ? 'border-primary bg-primary/20'
                 : 'border-primary/40 group-hover:border-primary/60 bg-primary/10'
             }`}>
-              <ArrowUp className={`w-6 h-6 transition-colors ${
+              <ArrowUp className={`w-5 h-5 transition-colors ${
                 isDragging ? 'text-primary' : 'text-primary/60'
               }`} />
             </div>
             <div className="text-center space-y-1">
-              <p className="text-xl font-mono text-foreground">
-                Drop your code session file
+              <p className="text-lg font-mono text-foreground">
+                Drop to analyze your session
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-base font-mono text-muted-foreground">
+                with{' '}
+                <span className="text-primary scan-glow">{displayText}</span>
+                <span className="inline-block w-[2px] h-4 bg-primary ml-0.5 align-middle animate-cursor-blink" />
+              </p>
+              <p className="text-xs text-muted-foreground pt-1">
                 or click to browse
               </p>
             </div>
             <div className="pt-2 border-t border-border/50 w-full">
               <p className="text-xs font-mono text-muted-foreground text-center">
-                Supports .json, .txt, .log, .md, .js, .ts
+                Supports .md files
               </p>
             </div>
           </div>
@@ -199,7 +233,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
       </div>
 
       {/* Terminal command below */}
-      <div className="mt-8 text-center font-mono text-sm">
+      <div className="mt-4 text-center font-mono text-xs">
         <p className="text-muted-foreground">
           <span className="text-primary">$</span> slait analyze --session <span className="text-primary">{fileName || '[file]'}</span> <span className="text-primary animate-pulse">|</span>
         </p>

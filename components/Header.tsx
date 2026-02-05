@@ -1,6 +1,10 @@
 'use client'
 
-export default function Header() {
+interface HeaderProps {
+  fileName?: string | null
+}
+
+export default function Header({ fileName }: HeaderProps) {
   return (
     <div className="w-full flex flex-col items-center justify-center text-center space-y-4 fade-in-up">
       {/* Logo */}
@@ -12,14 +16,9 @@ export default function Header() {
       </div>
 
       {/* Terminal prompt indicator */}
-      <div className="text-sm font-mono text-primary/70">
-        $ slait analyze --session <span className="text-primary/50 animate-pulse">[awaiting file]</span>
+      <div className="text-sm font-mono text-muted-foreground">
+        <span className="text-primary">$</span> slait analyze --session <span className={`text-primary ${!fileName ? 'animate-pulse' : ''}`}>{fileName || '[file]'}</span>
       </div>
-
-      {/* Tagline */}
-      <p className="text-lg text-muted-foreground">
-        How good of a vibecoder are you?
-      </p>
     </div>
   )
 }

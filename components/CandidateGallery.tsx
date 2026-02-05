@@ -121,9 +121,9 @@ export default function CandidateGallery() {
   const candidate = candidates[currentIndex]
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="w-full max-w-md mx-auto h-full flex flex-col">
       {/* Gallery Container */}
-      <div className="relative bg-card/50 border border-border rounded-lg p-6 backdrop-blur-sm">
+      <div className="relative bg-card/50 border border-border rounded-lg p-4 backdrop-blur-sm flex-1">
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-primary rounded-tl-lg" />
         <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-primary rounded-tr-lg" />
@@ -131,9 +131,9 @@ export default function CandidateGallery() {
         <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-primary rounded-br-lg" />
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-primary/60">$</span>
+            <span className="text-xs font-mono text-primary">$</span>
             <span className="text-sm font-mono text-muted-foreground">slait results</span>
           </div>
           <div className="flex items-center gap-1">
@@ -171,7 +171,7 @@ export default function CandidateGallery() {
           }`}
         >
           {/* Candidate Name & Score */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono text-muted-foreground">candidate:</span>
               <h3 className="text-lg font-semibold">
@@ -191,17 +191,17 @@ export default function CandidateGallery() {
           </div>
 
           {/* Radar Chart */}
-          <div className="flex justify-center py-2 overflow-visible">
-            <RadarChart 
-              data={candidate.data} 
+          <div className="flex justify-center py-1 overflow-visible">
+            <RadarChart
+              data={candidate.data}
               labels={labels}
               highlightIndex={candidate.highlightIndex}
-              size={320}
+              size={240}
             />
           </div>
 
           {/* Highlight Badge */}
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-2">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 border border-amber-500/40 rounded-full">
               <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
               <span className="text-xs font-mono text-amber-300">
