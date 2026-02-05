@@ -12,21 +12,8 @@ export const metadata: Metadata = {
   description: 'Analyze agentic code session prompts with AI-powered insights. Extract patterns, identify issues, and optimize your development workflow.',
   generator: 'v0.app',
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: '/images/Slait_Icon.png',
+    apple: '/images/Slait_Icon.png',
   },
 }
 
