@@ -135,6 +135,9 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
         backgroundPosition: '0 0, 2px 2px'
       }} />
 
+      {/* Try it out header */}
+      <p className="text-center text-lg font-semibold text-foreground mb-3">Try it out</p>
+
       {/* Main upload box */}
       <div
         className={`relative bg-card/50 border border-border rounded-lg p-6 transition-all duration-300 backdrop-blur-sm ${
