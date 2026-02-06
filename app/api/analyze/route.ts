@@ -50,6 +50,62 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * Validate that an excerpt actually exists in the original chat log.
+ * Strips markdown formatting and uses fuzzy substring matching to handle
+ * minor differences between the model's quote and the original text.
+ */
+function isExcerptInChatLog(excerpt: string, chatLog: string): boolean {
+  if (!excerpt || excerpt.length < 10) return false
+
+  // Aggressively normalize: lowercase, strip markdown/special chars, collapse whitespace
+  const normalize = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/```[\s\S]*?```/g, ' ')   // remove code fences
+      .replace(/[`*_#~>\-\[\](){}|\\]/g, '') // strip markdown chars
+      .replace(/\s+/g, ' ')
+      .trim()
+
+  const normalizedLog = normalize(chatLog)
+  const normalizedExcerpt = normalize(excerpt)
+
+  // Direct match
+  if (normalizedLog.includes(normalizedExcerpt)) return true
+
+  // Sliding window: check if any 3+ word consecutive chunk from the excerpt
+  // appears in the log (handles slight trimming/rewording at edges)
+  const words = normalizedExcerpt.split(' ').filter(w => w.length > 0)
+  for (let len = Math.min(words.length, 10); len >= 3; len--) {
+    for (let start = 0; start <= words.length - len; start++) {
+      const chunk = words.slice(start, start + len).join(' ')
+      if (chunk.length >= 15 && normalizedLog.includes(chunk)) return true
+    }
+  }
+
+  return false
+}
+
+/**
+ * Filter dimension evidence to only include excerpts that actually appear in the chat log.
+ */
+function validateDimensionEvidence(
+  evidence: { score: number; explanation: string; examples?: Array<{ excerpt: string; analysis: string }> } | undefined,
+  chatLog: string
+): { score: number; explanation: string; examples: Array<{ excerpt: string; analysis: string }> } | undefined {
+  if (!evidence) return undefined
+
+  const validExamples = (evidence.examples || []).filter(
+    (ex) => ex.excerpt && isExcerptInChatLog(ex.excerpt, chatLog)
+  )
+
+  return {
+    score: evidence.score,
+    explanation: evidence.explanation,
+    examples: validExamples,
+  }
+}
+
 async function analyzeAIChatLog(chatLog: string): Promise<AIUsageAnalysis> {
   const systemPrompt = `You are an AI evaluation agent used in a hiring assessment platform.
 
@@ -192,7 +248,12 @@ Return your evaluation in the following structured JSON format:
   "summary": "3–5 sentence executive summary written for a hiring manager"
 }
 
-IMPORTANT: For each dimension in dimension_evidence, provide 2-3 concrete examples from the actual chat log with brief excerpts and analysis.
+CITATION RULES (STRICTLY ENFORCED — violations will be automatically detected and removed):
+- The "excerpt" field MUST be an exact, verbatim copy-paste from the chat log provided above.
+- Do NOT paraphrase, summarize, reword, or fabricate any excerpt.
+- Do NOT invent quotes that sound plausible. Every excerpt is verified against the original text.
+- If you cannot find a real verbatim quote for a dimension, set its "examples" to an empty array [].
+- Prefer copying the candidate's actual prompts/messages rather than AI responses.
 
 Do NOT:
 - Comment on writing style or grammar
@@ -269,11 +330,11 @@ CRITICAL: Your response must be ONLY the JSON object. Do not include any explana
         engineeringJudgment: parsed.dimension_scores?.engineering_judgment || 3,
       },
       dimensionEvidence: {
-        planning: parsed.dimension_evidence?.planning,
-        promptIteration: parsed.dimension_evidence?.prompt_iteration,
-        debugging: parsed.dimension_evidence?.debugging,
-        toolControl: parsed.dimension_evidence?.tool_control,
-        engineeringJudgment: parsed.dimension_evidence?.engineering_judgment,
+        planning: validateDimensionEvidence(parsed.dimension_evidence?.planning, chatLog),
+        promptIteration: validateDimensionEvidence(parsed.dimension_evidence?.prompt_iteration, chatLog),
+        debugging: validateDimensionEvidence(parsed.dimension_evidence?.debugging, chatLog),
+        toolControl: validateDimensionEvidence(parsed.dimension_evidence?.tool_control, chatLog),
+        engineeringJudgment: validateDimensionEvidence(parsed.dimension_evidence?.engineering_judgment, chatLog),
       },
       strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
       weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses : [],
@@ -290,24 +351,6 @@ CRITICAL: Your response must be ONLY the JSON object. Do not include any explana
     console.error("Error analyzing AI chat log:", error)
     const errorMessage = error instanceof Error ? error.message : "Unknown error"
     console.error("Error details:", errorMessage)
-
-    return {
-      overallScore: 3,
-      confidence: "Low",
-      dimensionScores: {
-        planning: 3,
-        promptIteration: 3,
-        debugging: 3,
-        toolControl: 3,
-        engineeringJudgment: 3,
-      },
-      strengths: [],
-      weaknesses: [`Unable to analyze chat log: ${errorMessage}`],
-      detectedPatterns: [],
-      exampleEvidence: [],
-      hireSignal: "Borderline",
-      summary:
-        "Chat log analysis encountered an error. Manual review recommended.",
-    }
+    throw error
   }
 }

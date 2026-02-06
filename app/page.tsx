@@ -14,6 +14,12 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AIUsageAnalysis | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (analysisResult) {
+      console.log('[Slait] Analysis result set, switching to results view:', analysisResult.overallScore)
+    }
+  }, [analysisResult])
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const rafRef = useRef<number>(0)
 
@@ -33,7 +39,7 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="min-h-screen w-full overflow-hidden terminal-bg">
+    <main className={`min-h-screen w-full terminal-bg ${analysisResult ? 'overflow-y-auto' : 'overflow-hidden'}`}>
       {/* Static pixelated dither layer - always exists */}
       <div className="fixed inset-0 pixel-dither pointer-events-none opacity-0" id="dither-layer" />
 
