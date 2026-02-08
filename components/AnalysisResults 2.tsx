@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { AIUsageAnalysis } from '@/lib/types'
 import RadarChart from './RadarChart'
-import { CheckCircle, XCircle, AlertCircle, TrendingUp, TrendingDown, ChevronDown, ChevronUp, MessageSquare, Quote, FileText } from 'lucide-react'
+import { CheckCircle, XCircle, AlertCircle, TrendingUp, TrendingDown, ChevronDown, ChevronUp, MessageSquare, Quote } from 'lucide-react'
 
 interface AnalysisResultsProps {
   analysis: AIUsageAnalysis
@@ -41,10 +41,16 @@ function getScoreColor(score: number) {
 }
 
 export default function AnalysisResults({ analysis, onReset }: AnalysisResultsProps) {
-  const [expandedDimension, setExpandedDimension] = useState<string | null>(null)
+  const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(new Set())
 
   const toggleDimension = (key: string) => {
-    setExpandedDimension(expandedDimension === key ? null : key)
+    const newExpanded = new Set(expandedDimensions)
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key)
+    } else {
+      newExpanded.add(key)
+    }
+    setExpandedDimensions(newExpanded)
   }
 
   // Convert 1-5 scores to 0-100 for radar chart
@@ -69,14 +75,14 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Overall Score */}
           <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-1">Overall Score</p>
-            <div className={`text-6xl font-bold ${getScoreColor(analysis.overallScore)}`}>
+            <p className="text-xs font-mono text-muted-foreground mb-1">overall score</p>
+            <div className={`text-6xl font-bold font-mono ${getScoreColor(analysis.overallScore)}`}>
               {analysis.overallScore}
               <span className="text-2xl text-muted-foreground">/5</span>
             </div>
             <div className="flex items-center justify-center gap-2 mt-2">
-              <span className="text-xs text-muted-foreground">Confidence:</span>
-              <span className={`text-xs ${
+              <span className="text-xs font-mono text-muted-foreground">confidence:</span>
+              <span className={`text-xs font-mono ${
                 analysis.confidence === 'High' ? 'text-green-400' :
                 analysis.confidence === 'Medium' ? 'text-amber-400' : 'text-red-400'
               }`}>
@@ -87,14 +93,14 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
 
           {/* Hire Signal */}
           <div className={`px-6 py-3 rounded-lg border ${getHireSignalColor(analysis.hireSignal)}`}>
-            <p className="text-xs opacity-70 mb-1">Hire Signal</p>
-            <p className="text-2xl font-bold">{analysis.hireSignal}</p>
+            <p className="text-xs font-mono opacity-70 mb-1">hire signal</p>
+            <p className="text-2xl font-bold font-mono">{analysis.hireSignal}</p>
           </div>
 
           {/* Reset Button */}
           <button
             onClick={onReset}
-            className="px-4 py-2 bg-secondary hover:bg-secondary/80 border border-border rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="px-4 py-2 bg-secondary hover:bg-secondary/80 border border-border rounded-lg text-sm font-mono text-muted-foreground hover:text-foreground transition-colors"
           >
             Analyze Another
           </button>
@@ -110,8 +116,8 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
           <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-primary rounded-bl-lg" />
           <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-primary rounded-br-lg" />
 
-          <h3 className="text-sm text-muted-foreground mb-4">
-            Dimension Breakdown
+          <h3 className="text-sm font-mono text-muted-foreground mb-4">
+            <span className="text-primary">$</span> dimension breakdown
           </h3>
           <RadarChart data={radarData} labels={dimensionLabels} size={280} />
         </div>
@@ -123,8 +129,8 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
           <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-primary rounded-bl-lg" />
           <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-primary rounded-br-lg" />
 
-          <h3 className="text-sm text-muted-foreground mb-4">
-            Scores by Dimension
+          <h3 className="text-sm font-mono text-muted-foreground mb-4">
+            <span className="text-primary">$</span> scores by dimension
           </h3>
           <div className="space-y-4">
             {[
@@ -141,9 +147,9 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-foreground">{dim.label}</span>
+                      <span className="text-sm font-mono text-foreground">{dim.label}</span>
                       {dim.evidence && (
-                        expandedDimension === dim.key
+                        expandedDimensions.has(dim.key)
                           ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
                           : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
                       )}
@@ -159,7 +165,7 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
                           style={{ width: `${(dim.score / 5) * 100}%` }}
                         />
                       </div>
-                      <span className={`text-sm font-bold ${getScoreColor(dim.score)}`}>
+                      <span className={`text-sm font-mono font-bold ${getScoreColor(dim.score)}`}>
                         {dim.score}
                       </span>
                     </div>
@@ -167,7 +173,7 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
                 </button>
 
                 {/* Expanded Evidence Section */}
-                {expandedDimension === dim.key && dim.evidence && (
+                {expandedDimensions.has(dim.key) && dim.evidence && (
                   <div className="relative mt-3 pl-4 space-y-4 border-l-2 border-primary/30">
                     {/* Explanation */}
                     <p className="text-sm text-muted-foreground">{dim.evidence.explanation}</p>
@@ -177,18 +183,10 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
                       <div className="space-y-4">
                         {dim.evidence.examples.map((example, i) => (
                           <div key={i} className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                                <Quote className="w-3 h-3" />
-                                Citation {i + 1}
-                              </p>
-                              {example.location && (
-                                <span className="text-xs text-primary/80 bg-primary/10 px-2 py-0.5 rounded flex items-center gap-1">
-                                  <FileText className="w-3 h-3" />
-                                  {example.location}
-                                </span>
-                              )}
-                            </div>
+                            <p className="text-xs font-mono text-muted-foreground flex items-center gap-1.5">
+                              <Quote className="w-3 h-3" />
+                              Citation {i + 1}
+                            </p>
                             <blockquote className="relative text-sm italic text-foreground/80 bg-secondary/30 px-3 py-2 rounded border-l-2 border-primary/50">
                               "{example.excerpt}"
                             </blockquote>
@@ -219,7 +217,7 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
 
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-4 h-4 text-green-400" />
-            <h3 className="text-sm text-green-400">Strengths</h3>
+            <h3 className="text-sm font-mono text-green-400">strengths</h3>
           </div>
           <ul className="space-y-2">
             {analysis.strengths.length > 0 ? (
@@ -244,7 +242,7 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
 
           <div className="flex items-center gap-2 mb-4">
             <TrendingDown className="w-4 h-4 text-red-400" />
-            <h3 className="text-sm text-red-400">Weaknesses</h3>
+            <h3 className="text-sm font-mono text-red-400">weaknesses</h3>
           </div>
           <ul className="space-y-2">
             {analysis.weaknesses.length > 0 ? (
@@ -271,13 +269,13 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
 
           <div className="flex items-center gap-2 mb-4">
             <AlertCircle className="w-4 h-4 text-amber-400" />
-            <h3 className="text-sm text-amber-400">Detected Patterns</h3>
+            <h3 className="text-sm font-mono text-amber-400">detected patterns</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {analysis.detectedPatterns.map((pattern, i) => (
               <span
                 key={i}
-                className="px-3 py-1 text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full"
+                className="px-3 py-1 text-xs font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full"
               >
                 {pattern}
               </span>
@@ -296,7 +294,7 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
 
           <div className="flex items-center gap-2 mb-4">
             <Quote className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-sm text-cyan-400">Key Evidence</h3>
+            <h3 className="text-sm font-mono text-cyan-400">key evidence</h3>
           </div>
           <div className="space-y-4">
             {analysis.exampleEvidence.map((evidence, i) => (
@@ -323,8 +321,8 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
         <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-primary rounded-bl-lg" />
         <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-primary rounded-br-lg" />
 
-        <h3 className="text-sm text-muted-foreground mb-3">
-          Executive Summary
+        <h3 className="text-sm font-mono text-muted-foreground mb-3">
+          <span className="text-primary">$</span> executive summary
         </h3>
         <p className="text-foreground leading-relaxed">{analysis.summary}</p>
       </div>

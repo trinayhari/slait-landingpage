@@ -21,19 +21,31 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toolIndex, setToolIndex] = useState(0)
-  const [isToolAnimating, setIsToolAnimating] = useState(false)
+  const [displayText, setDisplayText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsToolAnimating(true)
-      setTimeout(() => {
-        setToolIndex((prev) => (prev + 1) % tools.length)
-        setIsToolAnimating(false)
-      }, 300)
-    }, 2500)
+    const currentTool = tools[toolIndex]
 
-    return () => clearInterval(interval)
-  }, [])
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        if (displayText.length < currentTool.length) {
+          setDisplayText(currentTool.slice(0, displayText.length + 1))
+        } else {
+          setTimeout(() => setIsDeleting(true), 2000)
+        }
+      } else {
+        if (displayText.length > 0) {
+          setDisplayText(displayText.slice(0, -1))
+        } else {
+          setIsDeleting(false)
+          setToolIndex((prev) => (prev + 1) % tools.length)
+        }
+      }
+    }, isDeleting ? 50 : 100)
+
+    return () => clearTimeout(timeout)
+  }, [displayText, isDeleting, toolIndex])
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault()
@@ -71,7 +83,6 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
     try {
       // Read the file content
       const content = await file.text()
-      console.log('[Slait] File read successfully, length:', content.length)
 
       // Call the API
       const response = await fetch('/api/analyze', {
@@ -82,24 +93,14 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
         body: JSON.stringify({ chatLog: content }),
       })
 
-      console.log('[Slait] API response status:', response.status)
-
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null)
-        const errorMsg = errorData?.details || errorData?.error || 'Failed to analyze chat log'
-        console.error('[Slait] API error:', errorMsg)
-        throw new Error(errorMsg)
+        throw new Error('Failed to analyze chat log')
       }
 
       const analysis: AIUsageAnalysis = await response.json()
-      console.log('[Slait] Analysis received:', {
-        overallScore: analysis.overallScore,
-        hireSignal: analysis.hireSignal,
-        hasEvidence: !!analysis.dimensionEvidence,
-      })
       onAnalysisComplete(analysis)
     } catch (err) {
-      console.error('[Slait] Error analyzing file:', err)
+      console.error('Error analyzing file:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsAnalyzing(false)
@@ -119,17 +120,16 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
 
   return (
     <div
-      className={`relative w-full py-4 px-2 transition-all duration-300 cursor-pointer ${
+      className={`relative w-full py-4 px-2 transition-all duration-300 ${
         isDragging ? 'scale-105' : 'scale-100'
       }`}
-      onClick={handleClick}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       {/* Dithered background */}
-      <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{
+      <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" style={{
         backgroundImage: 'linear-gradient(45deg, transparent 25%, rgba(0, 212, 255, 0.08) 25%, rgba(0, 212, 255, 0.08) 50%, transparent 50%, transparent 75%, rgba(0, 212, 255, 0.08) 75%, rgba(0, 212, 255, 0.08)), linear-gradient(45deg, transparent 25%, rgba(0, 212, 255, 0.08) 25%, rgba(0, 212, 255, 0.08) 50%, transparent 50%, transparent 75%, rgba(0, 212, 255, 0.08) 75%, rgba(0, 212, 255, 0.08))',
         backgroundSize: '4px 4px',
         backgroundPosition: '0 0, 2px 2px'
@@ -144,7 +144,8 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
           isDragging
             ? 'bg-primary/10 shadow-lg shadow-primary/30'
             : 'hover:bg-secondary/40'
-        } group`}
+        } cursor-pointer group`}
+        onClick={handleClick}
       >
         {/* Corner accents - matching CandidateGallery */}
         <div className={`absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 rounded-tl-lg transition-colors ${isDragging ? 'border-primary' : 'border-primary'}`} />
@@ -155,8 +156,8 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
           ref={fileInputRef}
           type="file"
           onChange={handleInputChange}
-          accept=".md,.txt,.json,.jsonl"
-          className="sr-only"
+          accept=".md"
+          className="hidden"
         />
 
         {isAnalyzing ? (
@@ -168,7 +169,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
               <div className="absolute inset-1 border border-primary/20 rounded-full animate-pulse" />
             </div>
             <div className="text-center">
-              <p className="text-lg text-primary">
+              <p className="text-lg font-mono text-primary scan-glow">
                 Analyzing session...
               </p>
               <p className="text-sm text-muted-foreground mt-1">
@@ -183,7 +184,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
               <AlertTriangle className="w-6 h-6 text-red-400" />
             </div>
             <div className="text-center">
-              <p className="text-lg text-red-400">Analysis failed</p>
+              <p className="text-lg font-mono text-red-400">Analysis failed</p>
               <p className="text-sm text-muted-foreground mt-1">{error}</p>
               <p className="text-xs text-muted-foreground mt-2">Click to try again</p>
             </div>
@@ -195,7 +196,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
               <ArrowUp className="w-6 h-6 text-primary" />
             </div>
             <div className="text-center">
-              <p className="text-lg text-primary">Ready to analyze</p>
+              <p className="text-lg font-mono text-primary">Ready to analyze</p>
               <p className="text-sm text-muted-foreground mt-1">{fileName}</p>
               <p className="text-xs text-muted-foreground mt-2">Drop another file or click to browse</p>
             </div>
@@ -213,39 +214,33 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
               }`} />
             </div>
             <div className="text-center space-y-1">
-              <p className="text-lg text-foreground">
+              <p className="text-lg font-mono text-foreground">
                 Drop to analyze your session
               </p>
-              <p className="text-base text-muted-foreground">
+              <p className="text-base font-mono text-muted-foreground">
                 with{' '}
-                <span
-                  className="inline-flex overflow-hidden transition-[width] duration-300 ease-in-out"
-                  style={{ width: `${tools[toolIndex].length}ch` }}
-                >
-                  <span
-                    className="text-primary font-bold transition-all duration-300 ease-in-out whitespace-nowrap"
-                    style={{
-                      transform: isToolAnimating ? 'translateY(-100%)' : 'translateY(0)',
-                      opacity: isToolAnimating ? 0 : 1,
-                    }}
-                  >
-                    {tools[toolIndex]}
-                  </span>
-                </span>
+                <span className="text-primary scan-glow">{displayText}</span>
+                <span className="inline-block w-[2px] h-4 bg-primary ml-0.5 align-middle animate-cursor-blink" />
               </p>
               <p className="text-xs text-muted-foreground pt-1">
                 or click to browse
               </p>
             </div>
             <div className="pt-2 border-t border-border/50 w-full">
-              <p className="text-xs text-muted-foreground text-center">
-                Supports .md, .txt, .json, .jsonl files
+              <p className="text-xs font-mono text-muted-foreground text-center">
+                Supports .md files
               </p>
             </div>
           </div>
         )}
       </div>
 
+      {/* Terminal command below */}
+      <div className="mt-4 text-center font-mono text-xs">
+        <p className="text-muted-foreground">
+          <span className="text-primary">$</span> slait analyze --session <span className="text-primary">{fileName || '[file]'}</span> <span className="text-primary animate-pulse">|</span>
+        </p>
+      </div>
     </div>
   )
 }

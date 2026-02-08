@@ -87,17 +87,72 @@ function isExcerptInChatLog(excerpt: string, chatLog: string): boolean {
 }
 
 /**
+ * Find the approximate location of an excerpt within the chat log.
+ * Returns a human-readable location string like "Line 42" or "Near beginning".
+ */
+function findExcerptLocation(excerpt: string, chatLog: string): string {
+  const normalize = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/```[\s\S]*?```/g, ' ')
+      .replace(/[`*_#~>\-\[\](){}|\\]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+  const normalizedLog = normalize(chatLog)
+  const normalizedExcerpt = normalize(excerpt)
+
+  let charIndex = normalizedLog.indexOf(normalizedExcerpt)
+
+  // If no direct match, try sliding window to find approximate position
+  if (charIndex === -1) {
+    const words = normalizedExcerpt.split(' ').filter(w => w.length > 0)
+    for (let len = Math.min(words.length, 10); len >= 3; len--) {
+      for (let start = 0; start <= words.length - len; start++) {
+        const chunk = words.slice(start, start + len).join(' ')
+        if (chunk.length >= 15) {
+          const idx = normalizedLog.indexOf(chunk)
+          if (idx !== -1) {
+            charIndex = idx
+            break
+          }
+        }
+      }
+      if (charIndex !== -1) break
+    }
+  }
+
+  if (charIndex === -1) return ''
+
+  // Count the line number in the original chat log by mapping back
+  // from normalized char position to approximate original position
+  const ratio = charIndex / normalizedLog.length
+  const approxOriginalPos = Math.floor(ratio * chatLog.length)
+  const lineNumber = chatLog.substring(0, approxOriginalPos).split('\n').length
+
+  return `Line ${lineNumber}`
+}
+
+/**
  * Filter dimension evidence to only include excerpts that actually appear in the chat log.
+ * Also computes the location of each excerpt within the log.
  */
 function validateDimensionEvidence(
   evidence: { score: number; explanation: string; examples?: Array<{ excerpt: string; analysis: string }> } | undefined,
   chatLog: string
-): { score: number; explanation: string; examples: Array<{ excerpt: string; analysis: string }> } | undefined {
+): { score: number; explanation: string; examples: Array<{ excerpt: string; analysis: string; location?: string }> } | undefined {
   if (!evidence) return undefined
 
-  const validExamples = (evidence.examples || []).filter(
-    (ex) => ex.excerpt && isExcerptInChatLog(ex.excerpt, chatLog)
-  )
+  const validExamples = (evidence.examples || [])
+    .filter((ex) => ex.excerpt && isExcerptInChatLog(ex.excerpt, chatLog))
+    .map((ex) => {
+      const location = findExcerptLocation(ex.excerpt, chatLog)
+      return {
+        excerpt: ex.excerpt,
+        analysis: ex.analysis,
+        ...(location ? { location } : {}),
+      }
+    })
 
   return {
     score: evidence.score,

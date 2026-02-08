@@ -124,26 +124,7 @@
   }
 }
 
-/* Terminal-style solid background */
-.terminal-bg {
-  background-color: #0a0e14;
-}
-
 @layer utilities {
-  /* Large terminal grid overlay */
-  .grid-overlay {
-    background-image: 
-      linear-gradient(0deg, transparent 49%, rgba(0, 212, 255, 0.06) 50%, transparent 51%),
-      linear-gradient(90deg, transparent 49%, rgba(0, 212, 255, 0.06) 50%, transparent 51%);
-    background-size: 120px 120px;
-  }
-
-  /* Terminal text effect */
-  .terminal-text {
-    font-family: 'Geist Mono', monospace;
-    letter-spacing: 0.05em;
-  }
-
   /* Glow animation */
   @keyframes glow-pulse {
     0%, 100% {
@@ -186,52 +167,5 @@
 
   .float {
     animation: float 3s ease-in-out infinite;
-  }
-
-  /* Scan lines */
-  @keyframes scan {
-    0% {
-      text-shadow: 0 0 0 rgba(0, 212, 255, 0.5);
-    }
-    50% {
-      text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-    }
-    100% {
-      text-shadow: 0 0 0 rgba(0, 212, 255, 0.5);
-    }
-  }
-
-  .scan-glow {
-    animation: scan 4s ease-in-out infinite;
-  }
-
-  /* Border accent animation */
-  @keyframes border-glow {
-    0%, 100% {
-      border-color: rgba(0, 212, 255, 0.3);
-      box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.2) inset;
-    }
-    50% {
-      border-color: rgba(0, 212, 255, 0.8);
-      box-shadow: 0 0 8px rgba(0, 212, 255, 0.3) inset;
-    }
-  }
-
-  .border-glow {
-    animation: border-glow 3s ease-in-out infinite;
-  }
-
-  /* Terminal cursor blink */
-  @keyframes cursor-blink {
-    0%, 50% {
-      opacity: 1;
-    }
-    51%, 100% {
-      opacity: 0;
-    }
-  }
-
-  .animate-cursor-blink {
-    animation: cursor-blink 1s step-end infinite;
   }
 }

@@ -1,8 +1,42 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import RadarChart from './RadarChart'
+
+// Scrambled name component - constantly changing letters
+function ScrambledName({ seed }: { seed: number }) {
+  const [chars, setChars] = useState<string[]>([])
+  const glitchChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*'
+  
+  // Generate a consistent "base" pattern based on seed
+  const nameLength = useMemo(() => 8 + (seed % 5), [seed])
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newChars: string[] = []
+      for (let i = 0; i < nameLength; i++) {
+        newChars.push(glitchChars[Math.floor(Math.random() * glitchChars.length)])
+      }
+      setChars(newChars)
+    }, 50)
+    
+    return () => clearInterval(interval)
+  }, [nameLength])
+  
+  return (
+    <span className="font-mono terminal-text tracking-wider text-foreground">
+      {chars.map((char, i) => (
+        <span 
+          key={i} 
+          className={i % 3 === 0 ? 'text-primary' : ''}
+        >
+          {char}
+        </span>
+      ))}
+    </span>
+  )
+}
 
 const labels = [
   'Architecture',
@@ -98,7 +132,10 @@ export default function CandidateGallery() {
 
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-muted-foreground">Results</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-primary">$</span>
+            <span className="text-sm font-mono text-muted-foreground">slait results</span>
+          </div>
           <div className="flex items-center gap-1">
             {candidates.map((_, idx) => (
               <button
@@ -133,13 +170,19 @@ export default function CandidateGallery() {
               : 'opacity-100 translate-x-0'
           }`}
         >
-          {/* Score */}
-          <div className="flex items-center justify-end mb-2">
+          {/* Candidate Name & Score */}
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">score:</span>
-              <span className={`text-2xl font-bold ${
-                candidate.score >= 85 ? 'text-primary' :
-                candidate.score >= 70 ? 'text-amber-400' :
+              <span className="text-xs font-mono text-muted-foreground">candidate:</span>
+              <h3 className="text-lg font-semibold">
+                <ScrambledName seed={candidate.id * 17} />
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-muted-foreground">score:</span>
+              <span className={`text-2xl font-bold font-mono ${
+                candidate.score >= 85 ? 'text-primary' : 
+                candidate.score >= 70 ? 'text-amber-400' : 
                 'text-red-400'
               }`}>
                 {candidate.score}
@@ -161,8 +204,8 @@ export default function CandidateGallery() {
           <div className="flex justify-center mt-2">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 border border-amber-500/40 rounded-full">
               <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-              <span className="text-xs text-amber-300">
-                Standout: {candidate.highlight}
+              <span className="text-xs font-mono text-amber-300">
+                standout: {candidate.highlight}
               </span>
             </div>
           </div>

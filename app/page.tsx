@@ -22,9 +22,7 @@ export default function Home() {
   }, [analysisResult])
 
   return (
-    <main className={`min-h-screen w-full terminal-bg ${analysisResult ? 'overflow-y-auto' : 'overflow-hidden'}`}>
-      {/* Grid overlay background */}
-      <div className="fixed inset-0 grid-overlay pointer-events-none" />
+    <main className={`min-h-screen w-full bg-background ${analysisResult ? 'overflow-y-auto' : 'overflow-hidden'}`}>
 
       <div className="relative z-10 flex flex-col items-center justify-between min-h-screen px-4 py-4">
         {/* Header */}

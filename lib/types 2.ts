@@ -4,7 +4,6 @@ export interface DimensionEvidence {
   examples?: Array<{
     excerpt: string
     analysis: string
-    location?: string
   }>
 }
 

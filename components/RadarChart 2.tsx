@@ -147,6 +147,18 @@ export default function RadarChart({
       ctx.fillText(displayLabel, x, y)
     }
 
+    // Draw data points
+    for (let i = 0; i < numPoints; i++) {
+      const angle = startAngle + i * angleStep
+      const value = data[i] / 100
+      const x = centerX + Math.cos(angle) * radius * value
+      const y = centerY + Math.sin(angle) * radius * value
+
+      ctx.beginPath()
+      ctx.arc(x, y, 3, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(0, 212, 255, 1)'
+      ctx.fill()
+    }
 
   }, [data, labels, highlightIndex, size])
 

@@ -29,11 +29,18 @@ export default function EarlyAccess() {
         <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-primary rounded-bl-lg" />
         <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-primary rounded-br-lg" />
 
+        {/* Terminal command */}
+        <div className="text-center mb-4">
+          <p className="text-xs font-mono text-muted-foreground">
+            <span className="text-primary">$</span> slait --subscribe --early-access
+          </p>
+        </div>
+
         {/* Content */}
-        <div className="text-center space-y-2 mb-4">
+        <div className="text-center space-y-2">
           <h2 className="text-2xl font-bold text-foreground">Interested?</h2>
 
-          <p className="text-base text-primary">
+          <p className="text-base font-mono text-primary">
             Sign up for early access
           </p>
 
@@ -45,7 +52,7 @@ export default function EarlyAccess() {
         {/* Form */}
         {isSubmitted ? (
           <div className="mt-4 text-center">
-            <p className="text-primary text-sm">Thanks! We&apos;ll be in touch.</p>
+            <p className="text-primary font-mono text-sm">Thanks! We&apos;ll be in touch.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-2">
@@ -56,14 +63,14 @@ export default function EarlyAccess() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full pl-10 pr-3 py-2 bg-input border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                className="w-full pl-10 pr-3 py-2 bg-input border border-border rounded-lg font-mono text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                 required
               />
             </div>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full px-4 py-2 bg-primary text-primary-foreground font-mono text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? 'Submitting...' : (
                 <>
