@@ -129,17 +129,6 @@
   background-color: #0a0e14;
 }
 
-/* Static pixelated dither pattern - always exists on page */
-.pixel-dither {
-  background-image: 
-    linear-gradient(45deg, rgba(0, 212, 255, 0.12) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(0, 212, 255, 0.12) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(0, 212, 255, 0.12) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(0, 212, 255, 0.12) 75%);
-  background-size: 4px 4px;
-  background-position: 0 0, 0 2px, 2px -2px, -2px 0px;
-}
-
 @layer utilities {
   /* Large terminal grid overlay */
   .grid-overlay {
