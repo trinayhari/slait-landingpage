@@ -83,6 +83,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
     try {
       // Read the file content
       const content = await file.text()
+      console.log('[Slait] File read successfully, length:', content.length)
 
       // Call the API
       const response = await fetch('/api/analyze', {
@@ -93,14 +94,24 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
         body: JSON.stringify({ chatLog: content }),
       })
 
+      console.log('[Slait] API response status:', response.status)
+
       if (!response.ok) {
-        throw new Error('Failed to analyze chat log')
+        const errorData = await response.json().catch(() => null)
+        const errorMsg = errorData?.details || errorData?.error || 'Failed to analyze chat log'
+        console.error('[Slait] API error:', errorMsg)
+        throw new Error(errorMsg)
       }
 
       const analysis: AIUsageAnalysis = await response.json()
+      console.log('[Slait] Analysis received:', {
+        overallScore: analysis.overallScore,
+        hireSignal: analysis.hireSignal,
+        hasEvidence: !!analysis.dimensionEvidence,
+      })
       onAnalysisComplete(analysis)
     } catch (err) {
-      console.error('Error analyzing file:', err)
+      console.error('[Slait] Error analyzing file:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsAnalyzing(false)

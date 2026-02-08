@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import RotatingText from '@/components/RotatingText'
 import UploadZone from '@/components/UploadZone'
@@ -14,8 +14,15 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AIUsageAnalysis | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (analysisResult) {
+      console.log('[Slait] Analysis result set, switching to results view:', analysisResult.overallScore)
+    }
+  }, [analysisResult])
+
   return (
-    <main className="min-h-screen w-full overflow-hidden terminal-bg">
+    <main className={`min-h-screen w-full terminal-bg ${analysisResult ? 'overflow-y-auto' : 'overflow-hidden'}`}>
       {/* Grid overlay background */}
       <div className="fixed inset-0 grid-overlay pointer-events-none" />
 
