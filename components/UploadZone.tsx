@@ -21,14 +21,19 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toolIndex, setToolIndex] = useState(0)
-  const [isToolAnimating, setIsToolAnimating] = useState(false)
+  const [toolAnimState, setToolAnimState] = useState<'idle' | 'exit' | 'enter'>('idle')
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIsToolAnimating(true)
+      setToolAnimState('exit')
       setTimeout(() => {
         setToolIndex((prev) => (prev + 1) % tools.length)
-        setIsToolAnimating(false)
+        setToolAnimState('enter')
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setToolAnimState('idle')
+          })
+        })
       }, 300)
     }, 2500)
 
@@ -223,10 +228,11 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
                   style={{ width: `${tools[toolIndex].length}ch` }}
                 >
                   <span
-                    className="text-primary font-bold transition-all duration-300 ease-in-out whitespace-nowrap"
+                    className="text-primary font-bold whitespace-nowrap"
                     style={{
-                      transform: isToolAnimating ? 'translateY(-100%)' : 'translateY(0)',
-                      opacity: isToolAnimating ? 0 : 1,
+                      transform: toolAnimState === 'exit' ? 'translateY(100%)' : toolAnimState === 'enter' ? 'translateY(-100%)' : 'translateY(0)',
+                      opacity: toolAnimState === 'idle' ? 1 : 0,
+                      transition: toolAnimState === 'enter' ? 'none' : 'all 300ms ease-in-out',
                     }}
                   >
                     {tools[toolIndex]}

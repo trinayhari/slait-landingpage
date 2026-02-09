@@ -6,7 +6,7 @@ const verbs = ['think', 'architect', 'iterate', 'build', 'debug', 'ship']
 
 export default function RotatingText() {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const [animState, setAnimState] = useState<'idle' | 'exit' | 'enter'>('idle')
   const [widths, setWidths] = useState<number[]>([])
 
   // Measure all word widths after fonts are loaded
@@ -31,10 +31,15 @@ export default function RotatingText() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIsAnimating(true)
+      setAnimState('exit')
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % verbs.length)
-        setIsAnimating(false)
+        setAnimState('enter')
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setAnimState('idle')
+          })
+        })
       }, 300)
     }, 2500)
 
@@ -53,10 +58,11 @@ export default function RotatingText() {
           style={{ width: widths.length > 0 ? widths[currentIndex] : undefined }}
         >
           <span
-            className="text-primary font-bold transition-all duration-300 ease-in-out whitespace-nowrap"
+            className="text-primary font-bold whitespace-nowrap"
             style={{
-              transform: isAnimating ? 'translateY(-100%)' : 'translateY(0)',
-              opacity: isAnimating ? 0 : 1,
+              transform: animState === 'exit' ? 'translateY(100%)' : animState === 'enter' ? 'translateY(-100%)' : 'translateY(0)',
+              opacity: animState === 'idle' ? 1 : 0,
+              transition: animState === 'enter' ? 'none' : 'all 300ms ease-in-out',
             }}
           >
             {verbs[currentIndex]}

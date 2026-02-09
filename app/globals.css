@@ -124,6 +124,14 @@
   }
 }
 
+/* Grid overlay - outside @layer so Tailwind doesn't purge it */
+.grid-overlay {
+  background-image:
+    linear-gradient(0deg, transparent 49%, rgba(0, 212, 255, 0.08) 50%, transparent 51%),
+    linear-gradient(90deg, transparent 49%, rgba(0, 212, 255, 0.08) 50%, transparent 51%);
+  background-size: 120px 120px;
+}
+
 @layer utilities {
   /* Glow animation */
   @keyframes glow-pulse {
