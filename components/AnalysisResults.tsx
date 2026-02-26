@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { AIUsageAnalysis } from '@/lib/types'
 import RadarChart from './RadarChart'
 import { CheckCircle, XCircle, AlertCircle, TrendingUp, TrendingDown, ChevronDown, ChevronUp, MessageSquare, Quote, FileText } from 'lucide-react'
@@ -8,6 +9,7 @@ import { CheckCircle, XCircle, AlertCircle, TrendingUp, TrendingDown, ChevronDow
 interface AnalysisResultsProps {
   analysis: AIUsageAnalysis
   onReset: () => void
+  savedSessionId?: string | null
 }
 
 const dimensionLabels = [
@@ -40,7 +42,7 @@ function getScoreColor(score: number) {
   return 'text-red-400'
 }
 
-export default function AnalysisResults({ analysis, onReset }: AnalysisResultsProps) {
+export default function AnalysisResults({ analysis, onReset, savedSessionId }: AnalysisResultsProps) {
   const [expandedDimension, setExpandedDimension] = useState<string | null>(null)
 
   const toggleDimension = (key: string) => {
@@ -92,12 +94,29 @@ export default function AnalysisResults({ analysis, onReset }: AnalysisResultsPr
           </div>
 
           {/* Reset Button */}
-          <button
-            onClick={onReset}
-            className="px-4 py-2 bg-secondary hover:bg-secondary/80 border border-border rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Analyze Another
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={onReset}
+              className="px-4 py-2 bg-secondary hover:bg-secondary/80 border border-border rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Analyze Another
+            </button>
+            {savedSessionId ? (
+              <Link
+                href="/dashboard"
+                className="px-4 py-2 bg-primary/20 border border-primary/40 rounded-lg text-sm text-primary hover:bg-primary/30 transition-colors"
+              >
+                View in Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/signup"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Sign up to save results and rank on the leaderboard
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 

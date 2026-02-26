@@ -4,14 +4,23 @@ import React from "react"
 
 import { useRef, useState, useEffect } from 'react'
 import { ArrowUp, AlertTriangle } from 'lucide-react'
-import { AIUsageAnalysis } from '@/lib/types'
+import { AIUsageAnalysis, SessionSource } from '@/lib/types'
+import { useAuth } from '@/components/AuthProvider'
 
-const tools = ['Cursor', 'Codex', 'Claude Code']
+const TOOLS_DISPLAY: Record<SessionSource, string> = {
+  cursor: 'Cursor',
+  claude: 'Claude',
+  chatgpt: 'ChatGPT',
+  copilot: 'Copilot',
+  windsurf: 'Windsurf',
+  other: 'Other',
+}
+const tools: SessionSource[] = ['cursor', 'claude', 'chatgpt', 'copilot', 'windsurf', 'other']
 
 interface UploadZoneProps {
   isAnalyzing: boolean
   setIsAnalyzing: (value: boolean) => void
-  onAnalysisComplete: (analysis: AIUsageAnalysis) => void
+  onAnalysisComplete: (analysis: AIUsageAnalysis, sessionId?: string | null) => void
   fileName: string | null
   setFileName: (value: string | null) => void
 }
@@ -22,6 +31,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
   const [error, setError] = useState<string | null>(null)
   const [toolIndex, setToolIndex] = useState(0)
   const [toolAnimState, setToolAnimState] = useState<'idle' | 'exit' | 'enter'>('idle')
+  const { user } = useAuth()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,6 +49,52 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
 
     return () => clearInterval(interval)
   }, [])
+
+  const handleFile = async (file: File) => {
+    setFileName(file.name)
+    setError(null)
+    setIsAnalyzing(true)
+
+    try {
+      const content = await file.text()
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatLog: content }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        const errorMsg = errorData?.details || errorData?.error || 'Failed to analyze chat log'
+        throw new Error(errorMsg)
+      }
+
+      const analysis: AIUsageAnalysis = await response.json()
+
+      let sessionId: string | null = null
+      if (user) {
+        const saveRes = await fetch('/api/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            analysis,
+            source: 'cursor',
+            fileName: file.name,
+          }),
+        })
+        if (saveRes.ok) {
+          const saved = await saveRes.json()
+          sessionId = saved.id ?? null
+        }
+      }
+
+      onAnalysisComplete(analysis, sessionId)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault()
@@ -65,49 +121,6 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
     const files = e.dataTransfer.files
     if (files && files.length > 0) {
       handleFile(files[0])
-    }
-  }
-
-  const handleFile = async (file: File) => {
-    setFileName(file.name)
-    setError(null)
-    setIsAnalyzing(true)
-
-    try {
-      // Read the file content
-      const content = await file.text()
-      console.log('[Slait] File read successfully, length:', content.length)
-
-      // Call the API
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ chatLog: content }),
-      })
-
-      console.log('[Slait] API response status:', response.status)
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null)
-        const errorMsg = errorData?.details || errorData?.error || 'Failed to analyze chat log'
-        console.error('[Slait] API error:', errorMsg)
-        throw new Error(errorMsg)
-      }
-
-      const analysis: AIUsageAnalysis = await response.json()
-      console.log('[Slait] Analysis received:', {
-        overallScore: analysis.overallScore,
-        hireSignal: analysis.hireSignal,
-        hasEvidence: !!analysis.dimensionEvidence,
-      })
-      onAnalysisComplete(analysis)
-    } catch (err) {
-      console.error('[Slait] Error analyzing file:', err)
-      setError(err instanceof Error ? err.message : 'An error occurred')
-    } finally {
-      setIsAnalyzing(false)
     }
   }
 
@@ -225,7 +238,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
                 with{' '}
                 <span
                   className="inline-flex overflow-hidden transition-[width] duration-300 ease-in-out"
-                  style={{ width: `${tools[toolIndex].length}ch` }}
+                  style={{ width: `${TOOLS_DISPLAY[tools[toolIndex]].length}ch` }}
                 >
                   <span
                     className="text-primary font-bold whitespace-nowrap"
@@ -235,7 +248,7 @@ export default function UploadZone({ isAnalyzing, setIsAnalyzing, onAnalysisComp
                       transition: toolAnimState === 'enter' ? 'none' : 'all 300ms ease-in-out',
                     }}
                   >
-                    {tools[toolIndex]}
+                    {TOOLS_DISPLAY[tools[toolIndex]]}
                   </span>
                 </span>
               </p>

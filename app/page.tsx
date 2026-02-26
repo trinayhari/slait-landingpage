@@ -14,12 +14,18 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AIUsageAnalysis | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
+  const [savedSessionId, setSavedSessionId] = useState<string | null>(null)
 
   useEffect(() => {
     if (analysisResult) {
       console.log('[Slait] Analysis result set, switching to results view:', analysisResult.overallScore)
     }
   }, [analysisResult])
+
+  const handleAnalysisComplete = (analysis: AIUsageAnalysis, sessionId?: string | null) => {
+    setAnalysisResult(analysis)
+    setSavedSessionId(sessionId ?? null)
+  }
 
   return (
     <main className={`min-h-screen w-full bg-background ${analysisResult ? 'overflow-y-auto' : 'overflow-hidden'}`}>
@@ -34,7 +40,8 @@ export default function Home() {
           <div className="w-full flex-1 py-8">
             <AnalysisResults
               analysis={analysisResult}
-              onReset={() => setAnalysisResult(null)}
+              onReset={() => { setAnalysisResult(null); setSavedSessionId(null) }}
+              savedSessionId={savedSessionId}
             />
           </div>
         ) : (
@@ -54,7 +61,7 @@ export default function Home() {
                 <UploadZone
                   isAnalyzing={isAnalyzing}
                   setIsAnalyzing={setIsAnalyzing}
-                  onAnalysisComplete={setAnalysisResult}
+                  onAnalysisComplete={handleAnalysisComplete}
                   fileName={fileName}
                   setFileName={setFileName}
                 />
