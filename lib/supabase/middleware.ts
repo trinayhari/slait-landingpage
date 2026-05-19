@@ -29,13 +29,13 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // getClaims() refreshes the session and must run for cookies to stay in sync
+  const { data } = await supabase.auth.getClaims()
+  const hasUser = !!data?.claims
 
-  // Protect /dashboard: redirect to login if not authenticated
+  // Protect authenticated app routes
   const isDashboard = request.nextUrl.pathname.startsWith("/dashboard")
-  if (isDashboard && !user) {
+  if (isDashboard && !hasUser) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     url.searchParams.set("redirect", request.nextUrl.pathname)

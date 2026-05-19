@@ -1,26 +1,29 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { Share2 } from "lucide-react"
 import { ShareCard } from "@/components/ShareCard"
 
-export default function SessionClient({ sessionId }: { sessionId: string }) {
+type SessionClientProps = {
+  sessionId: string
+  overallScore?: number | null
+}
+
+export default function SessionClient({ sessionId, overallScore }: SessionClientProps) {
   const [showShare, setShowShare] = useState(false)
   const baseUrl =
     typeof window !== "undefined"
       ? window.location.origin
       : process.env.NEXT_PUBLIC_SITE_URL || "https://slait.dev"
   const url = `${baseUrl}/session/${sessionId}`
+  const scoreLabel =
+    typeof overallScore === "number" ? `${overallScore.toFixed(1)}/5` : "\u2014/5"
 
   return (
-    <div className="flex items-center justify-between mb-6">
-      <Link
-        href="/leaderboard"
-        className="text-sm text-muted-foreground hover:text-primary"
-      >
-        ← Leaderboard
-      </Link>
+    <div className="mb-6 flex items-center justify-between gap-4">
+      <p className="text-sm text-muted-foreground">
+        Session <span className="text-foreground">· {scoreLabel}</span>
+      </p>
       <button
         type="button"
         onClick={() => setShowShare(true)}

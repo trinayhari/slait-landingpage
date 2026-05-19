@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server"
 
 const HANDLE_REGEX = /^[a-z0-9]([a-z0-9-]{0,29}[a-z0-9])?$/
 
+function generateHandle(user: { id: string }): string {
+  return `user-${user.id.slice(0, 8)}`
+}
+
 export async function GET() {
   const supabase = await createClient()
   const {
@@ -11,11 +15,32 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single()
+
+  if (error?.code === "PGRST116" || (!data && !error)) {
+    const handle = generateHandle(user)
+    const displayName =
+      user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? null
+    const { data: inserted, error: insertError } = await supabase
+      .from("profiles")
+      .insert({
+        id: user.id,
+        handle,
+        display_name: displayName,
+        avatar_url: user.user_metadata?.avatar_url ?? null,
+      })
+      .select()
+      .single()
+    if (insertError) {
+      console.error("[profile] GET insert error:", insertError)
+      return NextResponse.json({ error: insertError.message }, { status: 500 })
+    }
+    return NextResponse.json(inserted)
+  }
   if (error || !data) {
     return NextResponse.json({ error: error?.message ?? "Profile not found" }, { status: 500 })
   }

@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@recruiting-buddy/analysis": [
+        "../../packages/analysis/index.ts"
       ]
     }
   },

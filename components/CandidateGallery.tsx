@@ -89,7 +89,7 @@ export default function CandidateGallery() {
   return (
     <div className="w-full max-w-md mx-auto h-full flex flex-col">
       {/* Gallery Container */}
-      <div className="relative bg-card/50 border border-border rounded-lg p-4 backdrop-blur-sm flex-1">
+      <div className="glass-card p-4 flex-1">
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-primary rounded-tl-lg" />
         <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-primary rounded-tr-lg" />

@@ -11,7 +11,6 @@ type AuthContextType = {
   loading: boolean
   signInWithPassword: (email: string, password: string) => Promise<{ error: Error | null }>
   signUp: (email: string, password: string, metadata?: { full_name?: string }) => Promise<{ error: Error | null }>
-  signInWithOAuth: (provider: "github" | "google", next?: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -24,44 +23,122 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
-  const fetchProfile = async (userId: string) => {
+  const buildHandleBase = (value: string) => {
+    const sanitized = value.toLowerCase().replace(/[^a-z0-9]/g, "")
+    const nonEmpty = sanitized.length >= 2 ? sanitized : "user"
+    return nonEmpty.slice(0, 24)
+  }
+
+  const generateHandleCandidates = (authUser: User) => {
+    const nameFromMeta =
+      typeof authUser.user_metadata?.full_name === "string"
+        ? authUser.user_metadata.full_name
+        : ""
+    const emailPrefix = authUser.email?.split("@")[0] ?? ""
+    const base = buildHandleBase(nameFromMeta || emailPrefix || "user")
+    const stableSuffix = authUser.id.replace(/-/g, "").slice(0, 6).toLowerCase()
+    const randomSuffix = Math.random().toString(36).slice(2, 8)
+
+    return [`${base}-${stableSuffix}`, `${base}-${randomSuffix}`, `${base}-${Date.now().toString().slice(-6)}`]
+  }
+
+  const ensureProfile = async (authUser: User) => {
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
-      .eq("id", userId)
-      .single()
-    if (!error && data) setProfile(data as Profile)
-    else setProfile(null)
+      .eq("id", authUser.id)
+      .maybeSingle()
+
+    if (!error && data) {
+      setProfile(data as Profile)
+      return
+    }
+
+    if (error) {
+      setProfile(null)
+      return
+    }
+
+    const displayName =
+      typeof authUser.user_metadata?.full_name === "string"
+        ? authUser.user_metadata.full_name
+        : authUser.email?.split("@")[0] ?? null
+    const avatarUrl =
+      typeof authUser.user_metadata?.avatar_url === "string"
+        ? authUser.user_metadata.avatar_url
+        : null
+
+    for (const handle of generateHandleCandidates(authUser)) {
+      const { data: created, error: createError } = await supabase
+        .from("profiles")
+        .insert({
+          id: authUser.id,
+          handle,
+          display_name: displayName,
+          avatar_url: avatarUrl,
+        })
+        .select("*")
+        .single()
+
+      if (!createError && created) {
+        setProfile(created as Profile)
+        return
+      }
+    }
+
+    setProfile(null)
   }
 
   const refreshProfile = async () => {
-    if (user?.id) await fetchProfile(user.id)
+    if (user) await ensureProfile(user)
   }
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+    let loadingCleared = false
+
+    const clearLoading = () => {
+      if (!loadingCleared) {
+        loadingCleared = true
+        setLoading(false)
+      }
+    }
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
-      if (session?.user?.id) {
-        await fetchProfile(session.user.id)
+      if (session?.user) {
+        await ensureProfile(session.user)
       } else {
         setProfile(null)
       }
-      setLoading(false)
+      clearLoading()
     })
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      if (session?.user?.id) {
-        fetchProfile(session.user.id).finally(() => setLoading(false))
+    // Initial session/profile load on mount so we don't rely solely on the auth state change event
+    ;(async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (session?.user) {
+        setUser(session.user)
+        await ensureProfile(session.user)
       } else {
-        setLoading(false)
+        setUser(null)
+        setProfile(null)
       }
-    })
+      clearLoading()
+    })()
 
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
+    // Fallback: ensure we never hang if onAuthStateChange is slow
+    timeoutId = setTimeout(clearLoading, 150)
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      subscription.unsubscribe()
+    }
+  }, [])
 
   const signInWithPassword = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -73,30 +150,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     metadata?: { full_name?: string }
   ) => {
+    const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://slait.dev").replace(/\/$/, "")
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: metadata },
-    })
-    return { error: error as Error | null }
-  }
-
-  const signInWithOAuth = async (provider: "github" | "google", next?: string) => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
       options: {
-        redirectTo: next
-          ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
-          : `${window.location.origin}/auth/callback`,
+        data: metadata,
+        emailRedirectTo: `${baseUrl}/auth/callback?next=/dashboard`,
       },
     })
     return { error: error as Error | null }
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
     setUser(null)
     setProfile(null)
+    try {
+      await supabase.auth.signOut({ scope: "global" })
+    } catch {
+      // Continue with server-side/session cleanup below.
+    }
+
+    try {
+      await fetch("/api/auth/signout", { method: "POST", credentials: "include" })
+    } catch {
+      // Continue to local cleanup + hard navigation.
+    }
+
+    if (typeof window !== "undefined") {
+      try {
+        const keysToRemove: string[] = []
+        for (let i = 0; i < window.localStorage.length; i += 1) {
+          const key = window.localStorage.key(i)
+          if (key && key.startsWith("sb-") && key.includes("auth-token")) {
+            keysToRemove.push(key)
+          }
+        }
+        keysToRemove.forEach((key) => window.localStorage.removeItem(key))
+      } catch {
+        // localStorage may be unavailable in strict contexts.
+      }
+
+      window.location.replace("/")
+    }
   }
 
   return (
@@ -107,7 +203,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         signInWithPassword,
         signUp,
-        signInWithOAuth,
         signOut,
         refreshProfile,
       }}

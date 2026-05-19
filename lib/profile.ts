@@ -12,18 +12,35 @@ export async function getPublicProfileByHandle(handle: string) {
 
   if (profileError || !profile) return null
 
-  const { data: sessions } = await supabase
-    .from("sessions")
-    .select("id, source, file_name, overall_score, hire_signal, created_at")
-    .eq("user_id", profile.id)
-    .eq("is_public", true)
-    .order("created_at", { ascending: false })
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const { data: sessionsRaw } = await supabase.rpc("get_profile_sessions", {
+    p_profile_id: profile.id,
+  })
+  const sessions = (sessionsRaw ?? []).sort(
+    (a: { created_at: string }, b: { created_at: string }) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
+
+  const { data: projectsRaw } = await supabase.rpc("get_profile_projects", {
+    p_profile_id: profile.id,
+  })
+  const projects = (projectsRaw ?? []).sort(
+    (a: { created_at: string }, b: { created_at: string }) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
 
   const { data: leaderboard } = await supabase
     .from("leaderboard_stats")
-    .select("best_score, session_count, percentile_display, rank")
+    .select("best_score, avg_score, session_count, project_count, percentile_display, rank")
     .eq("id", profile.id)
     .single()
 
-  return { profile, sessions: sessions ?? [], leaderboard }
+  return {
+    profile,
+    sessions: sessions ?? [],
+    projects: projects ?? [],
+    leaderboard,
+    isOwner: user?.id === profile.id,
+  }
 }

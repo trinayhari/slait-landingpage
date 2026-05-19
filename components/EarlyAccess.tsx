@@ -22,7 +22,7 @@ export default function EarlyAccess() {
   return (
     <div className="w-full h-full flex flex-col">
       {/* Main card */}
-      <div className="relative bg-card/50 border border-border rounded-lg p-5 backdrop-blur-sm flex-1 flex flex-col justify-between">
+      <div className="glass-card p-5 flex-1 flex flex-col justify-between">
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-primary rounded-tl-lg" />
         <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-primary rounded-tr-lg" />

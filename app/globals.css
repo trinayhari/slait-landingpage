@@ -37,46 +37,13 @@
   --sidebar-accent-foreground: #0a0e14;
   --sidebar-border: #1f2d3a;
   --sidebar-ring: #00d4ff;
-}
-
-.dark {
-  --background: #0a0e14;
-  --foreground: #e8eef5;
-  --card: #111820;
-  --card-foreground: #e8eef5;
-  --popover: #111820;
-  --popover-foreground: #e8eef5;
-  --primary: #00d4ff;
-  --primary-foreground: #0a0e14;
-  --secondary: #1a2332;
-  --secondary-foreground: #e8eef5;
-  --muted: #2d3a48;
-  --muted-foreground: #8a96a8;
-  --accent: #00d4ff;
-  --accent-foreground: #0a0e14;
-  --destructive: #ff6b6b;
-  --destructive-foreground: #ffe8e8;
-  --border: #1f2d3a;
-  --input: #111820;
-  --ring: #00d4ff;
-  --chart-1: #00d4ff;
-  --chart-2: #748aa6;
-  --chart-3: #4d5e73;
-  --chart-4: #2d3a48;
-  --chart-5: #1a2332;
-  --sidebar: #111820;
-  --sidebar-foreground: #e8eef5;
-  --sidebar-primary: #00d4ff;
-  --sidebar-primary-foreground: #0a0e14;
-  --sidebar-accent: #00d4ff;
-  --sidebar-accent-foreground: #0a0e14;
-  --sidebar-border: #1f2d3a;
-  --sidebar-ring: #00d4ff;
+  --grid-color: rgba(0, 213, 255, 0.026);
+  --glow-color: rgba(0, 212, 255, 0.4);
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: var(--font-figtree);
+  --font-mono: var(--font-geist-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -121,25 +88,27 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-figtree), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   }
 }
 
-/* Grid overlay - outside @layer so Tailwind doesn't purge it */
-.grid-overlay {
+/* Page background: base color + grid. Use on the root content wrapper. */
+.page-bg {
+  background-color: var(--background);
   background-image:
-    linear-gradient(0deg, transparent 49%, rgba(0, 212, 255, 0.08) 50%, transparent 51%),
-    linear-gradient(90deg, transparent 49%, rgba(0, 212, 255, 0.08) 50%, transparent 51%);
-  background-size: 120px 120px;
+    linear-gradient(0deg, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 80px 80px;
 }
 
 @layer utilities {
   /* Glow animation */
   @keyframes glow-pulse {
     0%, 100% {
-      box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
+      box-shadow: 0 0 0 0 var(--glow-color);
     }
     50% {
-      box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+      box-shadow: 0 0 0 8px transparent;
     }
   }
 
@@ -163,6 +132,20 @@
     animation: fade-in-up 0.6s ease-out;
   }
 
+  /* Page transition: fade in when navigating to a new page */
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .page-transition {
+    animation: page-enter 0.25s ease-out;
+  }
+
   /* Subtle float animation */
   @keyframes float {
     0%, 100% {
@@ -175,5 +158,233 @@
 
   .float {
     animation: float 3s ease-in-out infinite;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass-card {
+    position: relative;
+    border-radius: 0.75rem;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 18px 40px rgba(15, 23, 42, 0.85);
+  }
+
+  .landing-panel {
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(12, 18, 28, 0.74);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 1.5rem;
+  }
+
+  .landing-card {
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(15, 23, 36, 0.68);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 1.5rem;
+  }
+
+  .landing-subcard {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(15, 23, 36, 0.56);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 1rem;
+  }
+
+  .section-eyebrow {
+    width: fit-content;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .step-pill {
+    width: fit-content;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+    color: color-mix(in oklab, var(--primary) 84%, white 16%);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.65rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  /* --- Landing polish utilities --- */
+
+  /* Eyebrow with accent dot — adds a small glowing dot prefix */
+  .section-eyebrow-dot::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--primary);
+    margin-right: 0.55rem;
+    vertical-align: 1px;
+    box-shadow: 0 0 10px var(--primary);
+  }
+
+  /* Refined feature card with gradient bg + hover lift */
+  .feature-card {
+    position: relative;
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: linear-gradient(180deg, rgba(17, 24, 35, 0.78) 0%, rgba(12, 18, 28, 0.6) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 1.5rem;
+    transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .feature-card:hover {
+    border-color: rgba(0, 212, 255, 0.32);
+    transform: translateY(-2px);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 212, 255, 0.1);
+  }
+
+  /* Numbered step circle */
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    font-family: var(--font-geist-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: color-mix(in oklab, var(--primary) 14%, transparent);
+    color: color-mix(in oklab, var(--primary) 88%, white 12%);
+    border: 1px solid color-mix(in oklab, var(--primary) 35%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 24px -8px var(--primary);
+  }
+
+  /* Pill chip for tool trust row */
+  .tool-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+  .tool-chip:hover {
+    color: var(--foreground);
+    border-color: rgba(0, 212, 255, 0.3);
+    background: rgba(0, 212, 255, 0.06);
+  }
+  .tool-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--primary);
+    box-shadow: 0 0 8px var(--primary);
+  }
+
+  /* Cyan→white gradient text accent for hero highlight */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--primary) 0%, #c8f7ff 55%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Stat strip block */
+  .stat-block {
+    padding: 1.25rem 1rem;
+    text-align: center;
+  }
+  .stat-value {
+    font-family: var(--font-geist-mono);
+    font-size: 1.85rem;
+    font-weight: 600;
+    color: var(--foreground);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .stat-label {
+    margin-top: 0.35rem;
+    font-size: 0.7rem;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Subtle horizontal section divider */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(148, 163, 184, 0.18) 50%, transparent 100%);
+  }
+
+  /* Score bar used inside the mock scorecard preview */
+  .score-bar {
+    height: 6px;
+    width: 100%;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.14);
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 55%, white 45%) 100%);
+    box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+
+  /* Hero / closing CTA panel with radial accent glow */
+  .cta-panel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    background:
+      radial-gradient(900px 420px at 50% 0%, rgba(0, 212, 255, 0.14), transparent 60%),
+      linear-gradient(180deg, rgba(17, 24, 35, 0.88), rgba(10, 14, 20, 0.88));
+    padding: 3rem 1.5rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 30px 80px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Product preview card — used to mock a scorecard in the hero */
+  .preview-card {
+    position: relative;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background:
+      radial-gradient(600px 260px at 0% 0%, rgba(0, 212, 255, 0.08), transparent 60%),
+      linear-gradient(180deg, rgba(17, 24, 35, 0.92), rgba(10, 14, 20, 0.92));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 1.5rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 30px 80px rgba(0, 0, 0, 0.5);
   }
 }
